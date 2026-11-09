@@ -221,6 +221,10 @@ it online, see [DEPLOY.md](DEPLOY.md).
   - iPhones only allow sound that a tap started, so every automatic turn after the first played
     silently and heard nothing. The recorder now reuses the sound engine unlocked by the first tap,
     and on narrow screens the timer and instructions stack instead of squeezing side by side.
+- **A faster engine for the same model:** the free server felt slow, so Whisper small moved to
+  faster-whisper. Before switching we re-ran every test: just as accurate on clean phrases,
+  *better* with loud music (26 vs 22 / 28), never fooled by silence, and 40% less memory. On a Mac
+  its 8-bit mode was actually slower, so it picks 8-bit only on Intel/AMD servers.
 
 ---
 

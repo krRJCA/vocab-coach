@@ -53,8 +53,8 @@ gh repo create vocab-coach --public --source . --push
    - Secrets: `TEAM_PASSWORD = "your team password"`.
 6. **Deploy.**
 
-Streamlit installs from `uv.lock` (with the CPU-only PyTorch) and `packages.txt` (ffmpeg). The
-first start downloads Whisper small and the Korean meaning model, so give it a few minutes.
+Streamlit installs from `uv.lock` (with the CPU-only PyTorch and faster-whisper) and
+`packages.txt` (ffmpeg). The first start downloads Whisper small (faster-whisper) and the Korean meaning model, so give it a few minutes.
 
 ### Updating later
 
@@ -68,8 +68,8 @@ The app restarts by itself. Learners keep their progress, since it lives in thei
 
 - **Sleeping:** apps sleep after about 12 hours without visitors. The next visitor sees a
   "wake up" button and waits about a minute. Learners' progress is unaffected.
-- **Memory:** Streamlit doesn't promise exact limits (about 1-2.7 GB). The app measured
-  ~0.55 GB after loading Whisper small, plus about 0.25 GB for the meaning model.
+- **Memory:** Streamlit doesn't promise exact limits (about 1-2.7 GB). Whisper small on faster-whisper peaks
+  at about 0.9 GB while transcribing, plus about 0.25 GB for the meaning model.
 - **Try the online behaviour on your Mac:** the `vocab-coach-online-test` dev server (in
   `.claude/launch.json`) runs the app as it runs online: browser storage, Whisper small only,
   hidden dev pages, and the team password `test-password`. Locally you can also set

@@ -1569,7 +1569,7 @@ def model_lab_page():
     if len(engines) == 1:
         st.info(f"This online version runs **{speech.ENGINES[engines[0]]['label']}** only, to fit the "
                 "free server. Try how it copes with your voice and café music below, and see how the "
-                "other models did in our tests at the bottom of the page. To compare all three live, "
+                "other models did in our tests at the bottom of the page. To compare them all live, "
                 "run the app on a laptop.", icon="ℹ️")
     phrases = [(chunk, scenario) for scenario in SCENARIOS for chunk in scenario["chunks"]]
     labels = {chunk["id"]: f"{scenario['icon']} {chunk['ko']} · {chunk['en']}" for chunk, scenario in phrases}
@@ -1645,7 +1645,7 @@ def model_lab_page():
         st.caption(f"Target phrase: {chunk['ko']}. The check is the app's real one: spelling, numbers "
                    "and key words, and a careful second listen with the lesson's phrases as a hint.")
 
-    st.subheader("Benchmark: all three models on the app's tests")
+    st.subheader("Benchmark: every model on the app's tests")
     rows = []
     for engine, info in speech.ENGINES.items():
         path = DATA_DIR / "asr_comparison" / f"{engine}.json"

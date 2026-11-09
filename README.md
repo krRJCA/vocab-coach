@@ -364,6 +364,20 @@ like the free Hugging Face Space:
 - **Qwen3-ASR** is 3× faster than Whisper-small and doesn't invent text from silence, but it's
   weaker in loud music, and it needs a separate environment.
 - **Whisper-small** stays the default: the best balance on free hardware.
+- **Then faster-whisper took over (November 2026).** The same Whisper small model on the
+  CTranslate2 engine (`whisper-small-fast`), tested with `dev/compare_asr.py` like the others:
+
+  | | Whisper small (transformers) | Whisper small (faster-whisper) |
+  | --- | --- | --- |
+  | Clean phrases | 91 / 91 | 91 / 91 |
+  | Music 5 dB below the voice | 27 / 28 | 27 / 28 |
+  | Music as loud as the voice | 22 / 28 | **26 / 28** |
+  | Wrong answers / answers from silence | 0 / 0 | 0 / 0 |
+  | Memory | 1.5 GB | **0.9 GB** |
+
+  It uses 8-bit maths on Intel/AMD servers (where that's fastest) and full precision on Apple
+  silicon, where 8-bit measured slower (3.0 vs 1.75 s per answer on 2 cores). The original
+  transformers engine stays available locally for comparison.
 - **All three are in the app as a showcase.** The sidebar's *Speech model* picker shows each
   model's pros and cons. The **🔬 Model lab** page (team password online) runs one recording through several models
   side by side: a sample phrase or your own voice, optionally with café music mixed in. It

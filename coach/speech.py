@@ -36,8 +36,15 @@ SR = 16000
 # What the app shows when someone picks a model. Numbers come from compare_asr.py:
 # 2 CPU cores (like the free Hugging Face Space), music test = voice as loud as the music.
 ENGINES = {
+    "whisper-small-fast": {
+        "label": "Whisper small (faster-whisper)", "tag": "Fast · default", "model": "Systran/faster-whisper-small",
+        "speed": "about 2 seconds per answer on a laptop, faster on Intel/AMD servers",
+        "pros": ["The same Whisper small model on a faster engine (CTranslate2)",
+                 "Good in noise: 26 / 28 phrases with loud music", "Uses 40% less memory (0.9 GB)"],
+        "cons": ["Can invent words from silence (the app filters these out)"],
+    },
     "whisper-small": {
-        "label": "Whisper small", "tag": "Fast · default", "model": "openai/whisper-small",
+        "label": "Whisper small (transformers)", "tag": "Fast · the original engine", "model": "openai/whisper-small",
         "speed": "about 2 seconds per answer",
         "pros": ["Quick enough for every answer", "Good in noise: 22 / 28 phrases with loud music"],
         "cons": ["Can invent words from silence (the app filters these out)"],
@@ -56,7 +63,10 @@ ENGINES = {
         "cons": ["Less accurate when it's noisy: 20 / 28 phrases with loud music"],
     },
 }
-DEFAULT_ENGINE = "whisper-small"
+# faster-whisper replaced the transformers Whisper small as the default (dev/compare_asr.py, 2 cores):
+# same 91/91 clean phrases and 0 wrong answers or answers from silence, better with loud music
+# (26 vs 22 / 28), and 0.9 instead of 1.5 GB of memory, which matters on Streamlit's free server.
+DEFAULT_ENGINE = "whisper-small-fast"
 MODEL_NAME = ENGINES[DEFAULT_ENGINE]["model"]
 
 # Whisper invents sentences from silence (often "시청해주셔서 감사합니다"),
@@ -68,6 +78,7 @@ SILENCE_LEVEL = 0.003
 # The token cap stops runaway repetition, which Whisper sometimes falls
 # into on unclear audio.
 GENERATE = {"language": "korean", "task": "transcribe", "num_beams": 3, "max_new_tokens": 64}
+FAST_BEAMS = int(os.environ.get("FAST_BEAMS", "3"))
 
 
 def qwen_python():
@@ -95,6 +106,8 @@ def is_available(engine=DEFAULT_ENGINE):
     if engine == "qwen3-asr":
         return Path(qwen_python()).exists()
     try:
+        if engine == "whisper-small-fast":
+            import faster_whisper  # noqa: F401
         import transformers  # noqa: F401
     except ImportError:
         return False
@@ -105,11 +118,28 @@ def available_engines():
     return [name for name in ENGINES if is_available(name)]
 
 
+def fast_compute_type():
+    """faster-whisper's number format: 8-bit on Intel/AMD (what servers run; that's where its 8-bit
+    maths is fast), full precision on Apple silicon, where 8-bit measured slower (3.0 vs 1.75 s on
+    2 cores). ASR_COMPUTE overrides it."""
+    import platform
+
+    if os.environ.get("ASR_COMPUTE"):
+        return os.environ["ASR_COMPUTE"]
+    return "int8" if platform.machine().lower() in ("x86_64", "amd64") else "float32"
+
+
 @lru_cache(maxsize=2)
 def load_model(engine=DEFAULT_ENGINE):
-    """Load a model once (Whisper: a transformers pipeline; Qwen: start the helper process)."""
+    """Load a model once (Whisper: a transformers pipeline or faster-whisper; Qwen: start the helper)."""
     if engine == "qwen3-asr":
         return _QwenWorker()
+    if engine == "whisper-small-fast":
+        from faster_whisper import WhisperModel
+
+        # 8-bit weights: about 3x less memory and much faster on a CPU, with the same model
+        return WhisperModel(ENGINES[engine]["model"], device="cpu", compute_type=fast_compute_type(),
+                            cpu_threads=int(os.environ.get("ASR_THREADS", "0")))
     from transformers import pipeline
 
     return pipeline("automatic-speech-recognition", model=ENGINES[engine]["model"])
@@ -246,6 +276,15 @@ def transcribe(audio, hint="", engine=DEFAULT_ENGINE):
     model = load_model(engine)
     if engine == "qwen3-asr":
         return model.transcribe(array, hint)
+    if engine == "whisper-small-fast":
+        # The same decoding as the transformers version below: Korean, 3 beams, no temperature
+        # fallback (re-decoding at higher temperatures is slower and tends to invent text).
+        segments, _ = model.transcribe(
+            array, language="ko", task="transcribe", beam_size=FAST_BEAMS, temperature=0,
+            initial_prompt=hint or None, condition_on_previous_text=False,
+            without_timestamps=True, max_new_tokens=GENERATE["max_new_tokens"],
+        )
+        return "".join(segment.text for segment in segments).strip()
     options = dict(GENERATE)
     if hint:
         options["prompt_ids"] = model.tokenizer.get_prompt_ids(hint, return_tensors="pt").to(model.device)

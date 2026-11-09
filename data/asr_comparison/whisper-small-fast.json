@@ -1,0 +1,42 @@
+{
+ "model": "Systran/faster-whisper-small",
+ "clean": {
+  "passed": 91,
+  "total": 91,
+  "misses": []
+ },
+ "music": {
+  "5 dB": {
+   "right_accepted": 27,
+   "wrong_accepted": 0,
+   "total": 28
+  },
+  "0 dB": {
+   "right_accepted": 26,
+   "wrong_accepted": 0,
+   "total": 28
+  }
+ },
+ "no_speech": {
+  "tone": {
+   "accepted": 0,
+   "total": 91,
+   "heard": ""
+  },
+  "fan noise": {
+   "accepted": 0,
+   "total": 91,
+   "heard": ""
+  },
+  "music only": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "baby i keep running back to you every night i'm dreaming of you"
+  }
+ },
+ "speed": {
+  "seconds_per_answer": 2.84,
+  "load_seconds": 2.4,
+  "peak_memory_gb": 0.91
+ }
+}

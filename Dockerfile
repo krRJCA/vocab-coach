@@ -34,7 +34,7 @@ COPY --chown=user . .
 # Download all models now (Whisper small + turbo, the Korean meaning model, Qwen3-ASR),
 # so nobody waits for a download later
 RUN /home/user/venv/bin/python -c "from coach import speech, semantic; \
-speech.load_model('whisper-small'); speech.load_model('whisper-turbo'); semantic.load_model()" \
+speech.load_model('whisper-small-fast'); speech.load_model('whisper-small'); speech.load_model('whisper-turbo'); semantic.load_model()" \
     && /home/user/qwen-venv/bin/python -c "from qwen_asr import Qwen3ASRModel; \
 Qwen3ASRModel.from_pretrained('Qwen/Qwen3-ASR-0.6B')"
 
