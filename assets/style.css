@@ -518,3 +518,21 @@ a.stat.due:hover { transform: translateY(-2px); border-color: var(--camellia); }
   border-color: rgba(128, 128, 128, 0.18) !important;
   border-radius: 0.8rem !important;
 }
+
+/* Time-attack summary card (app.py: time_attack_summary) */
+.ta-score { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+.ta-score-big { font-family: "Gowun Batang", serif; font-size: 2.6rem; font-weight: 700; line-height: 1;
+  color: var(--camellia, #c93a57); white-space: nowrap; }
+.ta-score-big span { font-size: 1.2rem; opacity: 0.6; margin-left: 0.2rem; }
+.ta-score-title { font-weight: 600; font-size: 1.1rem; line-height: 1.3; }
+.ta-score-sub { font-size: 0.85rem; opacity: 0.75; }
+.ta-lines { display: flex; flex-direction: column; }
+.ta-line { display: grid; grid-template-columns: 1.4rem 1.6rem 1fr auto; align-items: baseline; gap: 0.2rem;
+  padding: 0.45rem 0; border-top: 1px solid rgba(128, 128, 128, 0.18); }
+.ta-num { opacity: 0.55; font-size: 0.85rem; }
+.ta-said { font-size: 0.98rem; line-height: 1.4; word-break: keep-all; overflow-wrap: anywhere; }
+.ta-fix { font-size: 0.9rem; color: #2e8466; margin-top: 0.1rem; }
+.ta-wrong .ta-said { opacity: 0.8; }
+.ta-time { font-size: 0.8rem; opacity: 0.6; white-space: nowrap; }
+.ta-legend { font-size: 0.75rem; opacity: 0.6; margin-top: 0.5rem; }
+@media (max-width: 480px) { .ta-score-big { font-size: 2.1rem; } .ta-score { gap: 0.75rem; } }

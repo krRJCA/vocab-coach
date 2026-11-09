@@ -225,6 +225,11 @@ it online, see [DEPLOY.md](DEPLOY.md).
   faster-whisper. Before switching we re-ran every test: just as accurate on clean phrases,
   *better* with loud music (26 vs 22 / 28), never fooled by silence, and 40% less memory. On a Mac
   its 8-bit mode was actually slower, so it picks 8-bit only on Intel/AMD servers.
+- **A time-attack summary:** at the end of a round the page glides up to a score card and one
+  row per turn (their line, the task, your answer, a natural answer, how fast you started, your
+  recording), with the chat folded away, so nobody has to scroll back up. Testing it caught one
+  more bug: the recorder's countdown used animation frames, which stop when the page is hidden
+  (switching apps on a phone), freezing the turn; it now uses a timer.
 
 ---
 

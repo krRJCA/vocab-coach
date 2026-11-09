@@ -1028,13 +1028,19 @@ def roleplay(scenario):
             st.rerun()
         return
 
+    finished = len(answers) >= len(turns)
+    if timed and finished:  # time attack: a summary instead of scrolling back through the chat
+        time_attack_summary(turns, answers, f"{answers_key}-{round_}")
+        transcript = st.expander(T("Show the whole conversation"))
+    else:
+        transcript = st.container()
     for number, (turn, (answer, result, match, ai_note, spoken, *extra)) in enumerate(zip(turns, answers)):
-        with st.chat_message("assistant", avatar="🧑"):
+        with transcript, st.chat_message("assistant", avatar="🧑"):
             html(
                 f'<span class="speaker">{escape(turn["speaker"])}</span>'
                 f'<span class="ko-line">{escape(turn["prompt_ko"])}</span>'
             )
-        with st.chat_message("user", avatar="🙋"):
+        with transcript, st.chat_message("user", avatar="🙋"):
             st.write(f"🎙️ {answer}" if spoken and answer else (answer or T("⏰ No answer in time")))
             show_feedback(answer, result, match, ai_note, echo=False, accepted=turn["accepted"])
             if extra and extra[0] is not None:
@@ -1078,19 +1084,81 @@ def roleplay(scenario):
             st.rerun()
         return
 
-    passed = sum(result != "wrong" for _, result, *_ in answers)
-    summary = T("Conversation complete: {passed} / {total} replies understood.", passed=passed, total=len(turns))
-    if timed:
-        latencies = [a[5] for a in answers if len(a) > 5 and a[5] is not None]
-        if latencies:
-            summary += T(" Average start: {seconds} s.", seconds=f"{sum(latencies) / len(latencies):.1f}")
-    st.success(summary)
-    if timed:
-        glide_to_end(f"{answers_key}-{round_}")
+    if not timed:
+        passed = sum(result != "wrong" for _, result, *_ in answers)
+        st.success(T("Conversation complete: {passed} / {total} replies understood.", passed=passed, total=len(turns)))
     if st.button(T("Try again"), key=f"{answers_key}-again"):
         st.session_state[answers_key] = []
         st.session_state[f"{answers_key}-round"] = round_ + 1
         st.rerun()
+
+
+RESULT_MARKS = {"exact": ("✅", "Exactly right"), "close": ("⚠️", "Almost: check the spelling"),
+                "meaning": ("✅", "Right meaning, different words"), "wrong": ("❌", "Not quite")}
+
+
+def time_attack_summary(turns, answers, round_key):
+    """End of a time-attack round: one compact card with the score and a line per turn
+    (your answer, the right one if you missed it, how fast you started). Their lines are in
+    "Show the whole conversation"; the recordings in an expander below the card."""
+    passed = sum(result != "wrong" for _, result, *_ in answers)
+    latencies = [a[5] for a in answers if len(a) > 5 and a[5] is not None]
+    natural = sum(latency <= 2.0 for latency in latencies)
+    share = passed / len(turns)
+    headline = (T("Perfect conversation! 완벽해요!") if passed == len(turns)
+                else T("Great conversation!") if share >= 0.7 else T("Good start. Try it again!"))
+    rows = []
+    for number, (turn, (answer, result, match, ai_note, spoken, *extra)) in enumerate(zip(turns, answers), 1):
+        mark = RESULT_MARKS.get(result, RESULT_MARKS["wrong"])[0]
+        latency = extra[0] if extra else None
+        said = (escape(answer) if answer else T("🔇 (nothing heard)") if latency is not None
+                else T("⏰ (no answer)"))
+        fix = "" if result in ("exact", "meaning") else f'<div class="ta-fix">→ {escape(match)}</div>'
+        rows.append(
+            f'<div class="ta-line ta-{result}"><span class="ta-num">{number}</span><span class="ta-mark">{mark}</span>'
+            f'<div class="ta-said">{said}{fix}</div>'
+            f'<span class="ta-time">{"" if latency is None else f"{latency:.1f}s"}</span></div>'
+        )
+    pace = (T("average start {seconds} s", seconds=f"{sum(latencies) / len(latencies):.1f}")
+            + " · " + T("{n} at natural pace", n=natural)) if latencies else ""
+    with st.container(border=True, key=f"ta-summary-{round_key}"):
+        html(
+            '<div class="ta-score">'
+            f'<div class="ta-score-big">{passed}<span>/ {len(turns)}</span></div>'
+            f'<div><div class="ta-score-title">{headline}</div><div class="ta-score-sub">{pace}</div></div></div>'
+            f'<div class="ta-lines">{"".join(rows)}</div>'
+            f'<div class="ta-legend">✅ {T("right")} · ⚠️ {T("almost")} · ❌ {T("missed")} · '
+            f'→ {T("a natural answer")} · ⏱️ {T("time to start speaking")}</div>'
+        )
+    recorded = [(number, f"{round_key}-{number - 1}") for number, answer in enumerate(answers, 1)
+                if st.session_state.get("recordings", {}).get(f"{round_key}-{number - 1}")]
+    if recorded:
+        with st.expander(T("🎙️ Listen to your answers")):
+            for number, key in recorded:
+                st.caption(f"{number}. {T('You')}")
+                kept = st.session_state["recordings"][key]
+                st.audio(kept[0], format=kept[1])
+    glide_to(f"st-key-ta-summary-{round_key}", round_key)
+
+
+def glide_to(css_class, once_key):
+    """Smoothly bring an element (by its st-key-… class) to the top of the view, once."""
+    seen = st.session_state.setdefault("_glided", set())
+    if once_key in seen:
+        return
+    seen.add(once_key)
+    st.iframe(
+        f"<!-- {once_key} --><script>const glide = (smooth) => {{"
+        "const doc = window.parent.document;"
+        f"const target = doc.querySelector('.{css_class}');"
+        "const main = doc.querySelector('[data-testid=stMain]');"
+        "if (!target || !main) return;"
+        "const calm = window.parent.matchMedia('(prefers-reduced-motion: reduce)').matches || doc.hidden;"
+        "const top = main.scrollTop + target.getBoundingClientRect().top - main.getBoundingClientRect().top - 84;"
+        "if (Math.abs(main.scrollTop - top) > 40) main.scrollTo({top: Math.max(0, top), behavior: smooth && !calm ? 'smooth' : 'auto'});"
+        "}; setTimeout(() => glide(true), 300); setTimeout(() => glide(false), 1500);</script>",
+        height=1,
+    )
 
 
 def time_attack_turn(scenario, turn, answers, turn_id, listening, autostart):

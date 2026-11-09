@@ -198,9 +198,11 @@ export default function (component) {
         root.classList.toggle("ta-hurry", left < 0.3);
         const quietAfterSpeech = speechTime >= MIN_SPEECH && lastLoud !== null && elapsed - lastLoud > END_SILENCE;
         if (elapsed >= data.limit || quietAfterSpeech) return resolve();
-        requestAnimationFrame(tick);
+        // a timer, not requestAnimationFrame: animation frames stop when the page is hidden (another
+        // app or tab), which froze the turn; timers only slow down, so the answer still ends on time
+        setTimeout(() => tick(performance.now()), 33);
       };
-      requestAnimationFrame(tick);
+      tick(performance.now());
     });
 
     const stopped = new Promise((resolve) => (recorder.onstop = resolve));
