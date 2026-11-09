@@ -1,0 +1,42 @@
+{
+ "model": "Qwen/Qwen3-ASR-0.6B",
+ "clean": {
+  "passed": 91,
+  "total": 91,
+  "misses": []
+ },
+ "music": {
+  "5 dB": {
+   "right_accepted": 24,
+   "wrong_accepted": 0,
+   "total": 28
+  },
+  "0 dB": {
+   "right_accepted": 20,
+   "wrong_accepted": 0,
+   "total": 28
+  }
+ },
+ "no_speech": {
+  "tone": {
+   "accepted": 0,
+   "total": 91,
+   "heard": ""
+  },
+  "fan noise": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "아."
+  },
+  "music only": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "Baby, I keep running back to you. Every night, I'm dreaming of you."
+  }
+ },
+ "speed": {
+  "seconds_per_answer": 0.66,
+  "load_seconds": 21.6,
+  "peak_memory_gb": 3.66
+ }
+}

@@ -1,0 +1,21 @@
+.venv/
+.venv-qwen/
+__pycache__/
+*.pyc
+.DS_Store
+# secrets: Google sign-in keys never go into git
+.streamlit/secrets.toml
+# personal data
+data/progress.json
+data/tests.json
+data/feedback.json
+data/users/
+data/recordings/
+
+# dev-only: voice review tools, evaluation scripts and their data stay on your computer
+dev/
+data/voice_review.json
+data/voice_checks.json
+data/eval_answers.json
+data/audio/variants/
+data/audio/pilot/

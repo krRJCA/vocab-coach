@@ -1,0 +1,31 @@
+[project]
+name = "scenario-vocab-coach"
+version = "0.1.0"
+description = "Learn Korean phrases inside real scenarios with retrieval practice and spaced repetition."
+requires-python = ">=3.12"
+dependencies = [
+    "authlib>=1.3.2",
+    "pandas>=3.0.6",
+    "sentence-transformers>=3.0",
+    "streamlit>=1.65.0",
+    "torch>=2.15.0",
+]
+
+[tool.uv]
+package = false
+
+# On Linux (the Hugging Face server) use PyTorch's CPU-only build: the default one bundles
+# several GB of GPU (CUDA) libraries the free CPU Space can't use. Macs keep the normal build.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[dependency-groups]
+dev = [
+    "praat-parselmouth>=0.4.7",
+    "supertonic>=1.3.1",
+]

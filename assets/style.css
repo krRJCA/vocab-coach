@@ -1,0 +1,520 @@
+/* Extra styling on top of the theme in .streamlit/config.toml.
+   Custom blocks use translucent tints and inherit the text color,
+   so they work in both the light and the dark theme. */
+
+:root {
+  --camellia: #c93a57;
+  --harbor: #1e2a44;
+  --sea: #2b6f96;
+  --serif: "Gowun Batang", serif;
+}
+
+/* ---------- Home banner ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 2.4rem 2.4rem 2.6rem;
+  border-radius: 1.25rem;
+  color: #fdf9f4;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(240, 106, 132, 0.55) 0 9%, transparent 9.5%),
+    linear-gradient(135deg, #1e2a44 0%, #23466b 55%, #2b6f96 100%);
+  margin-bottom: 0.5rem;
+}
+.hero::after {           /* waves along the bottom */
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 46' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C150 6 300 46 450 26 S750 6 900 26 S1100 40 1200 22 V46 H0Z' fill='%23ffffff' fill-opacity='0.08'/%3E%3Cpath d='M0 34 C200 18 350 46 600 32 S1000 18 1200 34 V46 H0Z' fill='%23ffffff' fill-opacity='0.10'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat;
+}
+.hero-kicker {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  margin-bottom: 0.4rem;
+}
+.hero h1 {
+  font-family: var(--serif);
+  color: #fdf9f4 !important;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+  margin: 0 0 0.7rem;
+  padding: 0;
+}
+.hero h1 span { color: #fdf9f4; }
+.hero h1 .accent-word { color: #ff9fb1; }
+.hero p {
+  max-width: 34rem;
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0 0 1.2rem;
+}
+.hero-stats { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.hero-stats span {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.85rem;
+}
+
+/* ---------- How a lesson works ---------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (max-width: 900px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+.step {
+  padding: 1rem 1.1rem;
+  border-radius: 0.9rem;
+  background: rgba(201, 58, 87, 0.06);
+  border: 1px solid rgba(201, 58, 87, 0.16);
+}
+.step-number {
+  display: inline-grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--camellia);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+.step b { display: block; margin-bottom: 0.15rem; }
+.step small { opacity: 0.75; font-size: 0.88rem; }
+
+/* ---------- Scenario cards (keyed containers: st-key-card-<id>) ---------- */
+[class*="st-key-card-"] {
+  border-top: 5px solid var(--accent, var(--camellia)) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+[class*="st-key-card-"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(30, 42, 68, 0.12);
+}
+.st-key-card-cafe  { --accent: #b9773a; }
+.st-key-card-busan { --accent: #2b6f96; }
+.st-key-card-job   { --accent: #7b5ea7; }
+.st-key-card-office   { --accent: #4b7f52; }
+.st-key-card-pharmacy { --accent: #c25b4a; }
+.st-key-card-friends  { --accent: #d4a03a; }
+.card-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.card-title {
+  font-family: var(--serif) !important;
+  font-size: 1.45rem !important;
+  font-weight: 700;
+  margin: 0;
+}
+.card-sub { opacity: 0.75; margin: 0.1rem 0 0.6rem; }
+
+/* small rounded labels */
+.pill {
+  display: inline-block;
+  padding: 0.12rem 0.6rem;
+  margin: 0 0.3rem 0.3rem 0;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(43, 111, 150, 0.12);
+  border: 1px solid rgba(43, 111, 150, 0.22);
+}
+.pill.accent {
+  background: rgba(201, 58, 87, 0.1);
+  border-color: rgba(201, 58, 87, 0.25);
+}
+
+/* ---------- Lesson header ---------- */
+.lesson-head {
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+  padding: 1.3rem 1.5rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(120deg, rgba(201, 58, 87, 0.1), rgba(43, 111, 150, 0.1));
+  border: 1px solid rgba(43, 111, 150, 0.18);
+  margin-bottom: 0.6rem;
+}
+.lesson-icon {
+  font-size: 2.6rem;
+  width: 4.2rem;
+  height: 4.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+.lesson-head h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  margin: 0;
+  padding: 0;
+}
+.lesson-head p { margin: 0.35rem 0 0; opacity: 0.85; }
+
+/* ---------- Korean text ---------- */
+.ko {
+  font-family: var(--serif) !important;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0.1rem 0 0.2rem;
+}
+.ko-line { font-family: var(--serif) !important; font-size: 1.15rem; }
+.speaker {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.05rem 0.5rem;
+  margin-right: 0.4rem;
+  border-radius: 999px;
+  background: rgba(43, 111, 150, 0.14);
+  vertical-align: middle;
+}
+.note { margin: 0.35rem 0 0; font-size: 0.93rem; }
+.mistake {
+  margin: 0.45rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  background: rgba(217, 142, 43, 0.12);
+  border-left: 3px solid #d98e2b;
+}
+
+/* recall prompt */
+.prompt-label { font-size: 0.85rem; opacity: 0.7; margin-bottom: 0.1rem; }
+.prompt-en {
+  font-family: var(--serif) !important;
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.6rem;
+}
+
+.task {
+  padding: 0.7rem 1rem;
+  border-radius: 0.8rem;
+  background: rgba(46, 132, 102, 0.1);
+  border: 1px solid rgba(46, 132, 102, 0.25);
+  margin: 0.4rem 0 0.6rem;
+}
+
+/* ---------- Tabs and sidebar ---------- */
+[data-baseweb="tab-list"] { gap: 0.4rem; }
+[data-baseweb="tab"] { font-weight: 600; }
+
+.brand {
+  font-family: var(--serif) !important;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+}
+.brand span { color: var(--camellia); }
+.brand-sub { font-size: 0.82rem; opacity: 0.7; margin-bottom: 0.8rem; }
+
+/* audio players: a little tighter */
+[data-testid="stAudio"] { margin: 0.15rem 0; }
+
+/* ---------- Voice recorder: a big round mic, like chat apps' voice buttons ---------- */
+[data-testid="stAudioInput"] > div:has([data-testid="stAudioInputActionButton"]) {
+  min-height: 84px;
+  padding: 0 1.2rem 0 0.75rem;
+  border-radius: 999px;
+  gap: 0.9rem;
+  align-items: center;
+}
+/* the slot holding the buttons: after a recording it holds Record + Play side by side */
+[data-testid="stAudioInput"] div:has(> [data-testid="stAudioInputActionButton"]) {
+  width: auto !important;
+  height: 60px !important;
+  padding: 0 !important;
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center;
+  gap: 0.6rem;
+}
+[data-testid="stAudioInputActionButton"] {
+  width: 60px !important;
+  min-width: 60px !important;
+  height: 60px !important;
+  flex: 0 0 60px !important;
+  border-radius: 50% !important;
+  background: var(--camellia) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(201, 58, 87, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+[data-testid="stAudioInputActionButton"]:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: 0 8px 22px rgba(201, 58, 87, 0.45);
+}
+[data-testid="stAudioInputActionButton"] svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+/* while recording: red stop button with a pulsing ring */
+[data-testid="stAudioInputActionButton"][aria-label="Stop recording"] {
+  background: #e5484d !important;
+  animation: mic-pulse 1.4s ease-out infinite;
+}
+@keyframes mic-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.55); }
+  70%  { box-shadow: 0 0 0 16px rgba(229, 72, 77, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0); }
+}
+/* after recording, play/pause is a smaller outlined button next to the mic */
+[data-testid="stAudioInputActionButton"]:not([aria-label="Record"]):not([aria-label="Stop recording"]) {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+  background: transparent !important;
+  color: inherit !important;
+  border: 1.5px solid rgba(128, 128, 128, 0.45) !important;
+  box-shadow: none;
+}
+[data-testid="stAudioInputActionButton"]:not([aria-label="Record"]):not([aria-label="Stop recording"]):hover {
+  transform: none;
+  border-color: var(--camellia) !important;
+  box-shadow: none;
+}
+[data-testid="stAudioInputActionButton"]:not([aria-label="Record"]):not([aria-label="Stop recording"]) svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="stAudioInputActionButton"] { animation: none !important; transition: none; }
+}
+[data-testid="stAudioInputWaveformTimeCode"] { font-size: 0.95rem; opacity: 0.8; }
+
+/* ---------- Sidebar ---------- */
+.side-brand {
+  position: relative;
+  overflow: hidden;
+  padding: 1.1rem 1.1rem 1rem;
+  border-radius: 1rem;
+  color: #fdf9f4;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(240, 106, 132, 0.6) 0 14%, transparent 14.5%),
+    linear-gradient(140deg, #1e2a44 0%, #23466b 60%, #2b6f96 100%);
+  margin-bottom: 0.9rem;
+}
+.side-logo {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 0.45rem;
+}
+.side-brand .brand { color: #fdf9f4; font-size: 1.55rem; margin: 0; }
+.side-brand .brand span { color: #ff9fb1; }
+.side-brand .brand-sub { color: #fdf9f4; opacity: 0.8; margin: 0.15rem 0 0.7rem; }
+.wip-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  color: #3b2a00;
+  background: #ffcf5c;
+}
+.side-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+.stat {
+  text-align: center;
+  padding: 0.55rem 0.2rem 0.45rem;
+  border-radius: 0.8rem;
+  background: rgba(43, 111, 150, 0.08);
+  border: 1px solid rgba(43, 111, 150, 0.16);
+}
+.stat b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+.stat span { font-size: 0.7rem; opacity: 0.7; }
+.stat.due {
+  background: rgba(201, 58, 87, 0.1);
+  border-color: rgba(201, 58, 87, 0.28);
+}
+.stat.due b { color: var(--camellia); }
+.side-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin: 0 0 0.35rem 0.2rem;
+}
+.side-foot {
+  font-size: 0.72rem;
+  opacity: 0.55;
+  line-height: 1.5;
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+/* ---------- Under construction banner ---------- */
+.wip-banner {
+  padding: 0.55rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.8rem;
+  font-size: 0.88rem;
+  color: #3b2a00;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 207, 92, 0.95) 0 14px, rgba(255, 195, 60, 0.95) 14px 28px);
+  border: 1px solid rgba(160, 110, 0, 0.35);
+}
+
+/* ---------- Levels on Home ---------- */
+.level-head {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  margin: 1.6rem 0 0.6rem;
+}
+.level-badge {
+  flex-shrink: 0;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--camellia);
+}
+.level-head b { font-family: var(--serif); font-size: 1.25rem; margin-right: 0.3rem; }
+.level-head .pill { margin-left: 0.4rem; vertical-align: middle; }
+.level-sub { font-size: 0.88rem; opacity: 0.75; margin-top: 0.2rem; }
+.st-key-card-restaurant { --accent: #c9822e; }
+.st-key-card-store      { --accent: #3f8f8a; }
+.st-key-card-market     { --accent: #2b6f96; }
+.st-key-card-dorm       { --accent: #8a6d4f; }
+[class*="st-key-card-checkpoint"] {
+  --accent: #e0a526;
+  background: rgba(224, 165, 38, 0.07);
+}
+[class*="st-key-card-planned"] {
+  border-top-style: dashed !important;
+  --accent: rgba(128, 128, 128, 0.5);
+  opacity: 0.85;
+}
+[class*="st-key-card-planned"]:hover { transform: none; box-shadow: none; }
+
+/* "Exactly right" and other success messages: unmistakably green */
+[data-testid="stAlertContentSuccess"] { font-weight: 500; }
+[data-testid="stAlertContainer"]:has([data-testid="stAlertContentSuccess"]) {
+  border-left: 4px solid #2fb164;
+}
+
+/* ---------- Moving between lessons ---------- */
+[class*="st-key-course-nav"] {
+  padding: 0.6rem 0.8rem 0.4rem;
+  border-radius: 0.9rem;
+  background: rgba(43, 111, 150, 0.08);
+  border: 1px solid rgba(43, 111, 150, 0.18);
+  margin-bottom: 0.4rem;
+}
+[class*="st-key-course-nav"] button p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.course-where { font-size: 0.8rem; opacity: 0.7; text-align: center; margin-top: -0.2rem; }
+[class*="st-key-next-up"] {
+  margin-top: 1.5rem;
+  border-left: 5px solid var(--camellia) !important;
+}
+.next-title { font-family: var(--serif) !important; font-size: 1.35rem; font-weight: 700; margin: 0.1rem 0 0.5rem; }
+
+a.stat.due { color: inherit; text-decoration: none; transition: transform 0.15s ease; }
+a.stat.due:hover { transform: translateY(-2px); border-color: var(--camellia); }
+
+/* =========================================================================
+   Calmer layout ("easy on the eyes"): a comfortable reading width, more
+   space between things, fewer borders, quieter notices.
+   ========================================================================= */
+
+/* a centered reading column instead of edge-to-edge */
+[data-testid="stMainBlockContainer"], .block-container {
+  max-width: 960px !important;
+  padding-top: 3rem !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  padding-bottom: 5rem !important;
+}
+/* more air between elements and around headings */
+[data-testid="stMain"] [data-testid="stVerticalBlock"] { gap: 1.15rem; }
+[data-testid="stMain"] h2, [data-testid="stMain"] h3 { margin-top: 1.4rem !important; }
+[data-testid="stMain"] p, [data-testid="stMain"] li { line-height: 1.7; }
+[data-testid="stCaptionContainer"] { opacity: 0.85; line-height: 1.6; }
+
+/* fewer outlines: bordered boxes become soft, borderless panels */
+[data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"],
+[data-testid="stMain"] [class*="st-key-card-"],
+[data-testid="stMain"] [class*="st-key-next-up"] {
+  border-color: transparent !important;
+  background: rgba(128, 128, 128, 0.06);
+  border-radius: 1rem !important;
+}
+[data-testid="stMain"] [class*="st-key-card-"] { border-top: 4px solid var(--accent, var(--camellia)) !important; }
+[data-testid="stMain"] [class*="st-key-card-"] > div { padding: 0.4rem 0.3rem; }
+.lesson-head { border: 0 !important; padding: 1.5rem 1.6rem !important; }
+.step { border: 0 !important; }
+[data-testid="stChatMessage"] { background: transparent !important; padding: 0.4rem 0 !important; }
+
+/* the lesson navigation bar: a quiet row, not a box */
+[class*="st-key-course-nav"] {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+.course-where { margin-top: 0.1rem; }
+
+/* notices: one slim, muted line instead of a striped yellow block */
+.wip-banner {
+  background: rgba(224, 165, 38, 0.10) !important;
+  border: 0 !important;
+  color: inherit !important;
+  font-size: 0.82rem !important;
+  padding: 0.45rem 0.9rem !important;
+  border-radius: 999px !important;
+  opacity: 0.9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.6rem !important;
+}
+.wip-sep { opacity: 0.5; }
+
+/* sidebar: lighter and more spacious */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 0.9rem; }
+.stat { border: 0 !important; background: rgba(128, 128, 128, 0.08) !important; }
+.stat.due { background: rgba(201, 58, 87, 0.12) !important; }
+[data-testid="stSidebar"] [class*="st-key-side-settings"] {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+.side-label { margin-top: 0.4rem; }
+
+/* expanders (folded sections) blend in */
+[data-testid="stMain"] [data-testid="stExpander"] details {
+  border-color: rgba(128, 128, 128, 0.18) !important;
+  border-radius: 0.8rem !important;
+}

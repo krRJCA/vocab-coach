@@ -1,0 +1,42 @@
+{
+ "model": "openai/whisper-small",
+ "clean": {
+  "passed": 91,
+  "total": 91,
+  "misses": []
+ },
+ "music": {
+  "5 dB": {
+   "right_accepted": 27,
+   "wrong_accepted": 0,
+   "total": 28
+  },
+  "0 dB": {
+   "right_accepted": 22,
+   "wrong_accepted": 0,
+   "total": 28
+  }
+ },
+ "no_speech": {
+  "tone": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아 아"
+  },
+  "fan noise": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "양념장"
+  },
+  "music only": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "Baby, I keep running back to you. Every night, I'm dreaming of you."
+  }
+ },
+ "speed": {
+  "seconds_per_answer": 2.11,
+  "load_seconds": 5.6,
+  "peak_memory_gb": 1.71
+ }
+}

@@ -1,0 +1,142 @@
+<!-- Conversation player for the Situation tab (filled in by app.py).
+     Plays a scenario's dialogue as one track and highlights the line being spoken.
+     Click a line to jump there; 🔁 repeats just that line. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --text: #1e2a44; --muted: rgba(30, 42, 68, 0.62); --card: #ffffff;
+    --border: #e6ddd1; --accent: #c93a57; --accent-soft: rgba(201, 58, 87, 0.08);
+    --me: rgba(43, 111, 150, 0.08); --track: #efe7dd;
+  }
+  :root.dark {
+    --text: #ede8e1; --muted: rgba(237, 232, 225, 0.6); --card: #1b2436;
+    --border: #2c364b; --accent: #f06a84; --accent-soft: rgba(240, 106, 132, 0.12);
+    --me: rgba(124, 192, 230, 0.08); --track: #2c364b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: transparent; color: var(--text);
+         font-family: "IBM Plex Sans KR", sans-serif; }
+  .bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px;
+         padding: 10px 12px; margin-bottom: 14px; border-radius: 14px;
+         background: var(--card); border: 1px solid transparent; }
+  .play { width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+          background: var(--accent); color: #fff; font-size: 18px; flex-shrink: 0; }
+  .play:focus-visible, .line:focus-visible, .repeat:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .info { flex: 1; min-width: 0; }
+  .title { font-weight: 600; font-size: 14px; }
+  .time { font-size: 12px; color: var(--muted); }
+  .track { height: 6px; border-radius: 3px; background: var(--track); margin-top: 6px; cursor: pointer; }
+  .fill { height: 100%; width: 0; border-radius: 3px; background: var(--accent); }
+  .speed { border: 1px solid var(--border); background: transparent; color: var(--text);
+           border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .lines { display: flex; flex-direction: column; gap: 12px; }
+  .line { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 14px;
+          border: 1px solid transparent; background: var(--card); cursor: pointer; line-height: 1.5;
+          transition: background .2s, border-color .2s, transform .2s; }
+  .line.me { background: var(--me); margin-left: 36px; }
+  .line:not(.me) { margin-right: 36px; }
+  .line.active { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.01); }
+  .line.silent { cursor: default; opacity: .7; }
+  .avatar { font-size: 22px; line-height: 1; padding-top: 2px; }
+  .body { flex: 1; min-width: 0; }
+  .speaker { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
+             background: rgba(43, 111, 150, 0.16); margin-right: 6px; vertical-align: middle; }
+  .ko { font-family: "Gowun Batang", serif; font-weight: 700; font-size: 18px; vertical-align: middle; }
+  .rom, .en { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .en { font-style: italic; }
+  .repeat { border: 0; background: transparent; cursor: pointer; font-size: 16px; padding: 2px 4px;
+            border-radius: 8px; color: var(--text); opacity: .65; }
+  .repeat:hover { opacity: 1; background: var(--accent-soft); }
+</style>
+
+<div class="bar">
+  <button class="play" id="play" aria-label="Play conversation">▶</button>
+  <div class="info">
+    <div class="title">Play the whole conversation</div>
+    <div class="time" id="time">0:00</div>
+    <div class="track" id="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <button class="speed" id="speed" title="Playback speed">1×</button>
+</div>
+<div class="lines" id="lines"></div>
+<audio id="audio" preload="auto"></audio>
+
+<script>
+  const DATA = __DATA__;
+  if (DATA.dark) document.documentElement.classList.add("dark");
+  const audio = document.getElementById("audio");
+  audio.src = DATA.audio;
+  const playButton = document.getElementById("play");
+  const timing = Object.fromEntries(DATA.timings.map(t => [t.line, t]));
+  const rows = [];
+  let stopAt = null;  // end time when repeating a single line
+
+  DATA.lines.forEach((line, i) => {
+    const row = document.createElement("div");
+    const t = timing[i];
+    row.className = "line" + (line.speaker === "나" ? " me" : "") + (t ? "" : " silent");
+    row.innerHTML = `
+      <div class="avatar">${line.speaker === "나" ? "🙋" : "🧑"}</div>
+      <div class="body">
+        <span class="speaker"></span><span class="ko"></span>
+        ${DATA.romanization ? '<div class="rom"></div>' : ""}
+        ${DATA.english ? '<div class="en"></div>' : ""}
+      </div>
+      ${t ? '<button class="repeat" title="Repeat this line" aria-label="Repeat this line">🔁</button>' : ""}`;
+    row.querySelector(".speaker").textContent = line.speaker;
+    row.querySelector(".ko").textContent = line.ko;
+    if (DATA.romanization) row.querySelector(".rom").textContent = line.romanization;
+    if (DATA.english) row.querySelector(".en").textContent = line.en;
+    if (t) {
+      row.tabIndex = 0;
+      row.addEventListener("click", () => playFrom(t.start, null));
+      row.addEventListener("keydown", e => { if (e.key === "Enter") playFrom(t.start, null); });
+      row.querySelector(".repeat").addEventListener("click", e => {
+        e.stopPropagation();
+        playFrom(t.start, t.end);
+      });
+    }
+    document.getElementById("lines").appendChild(row);
+    rows.push(row);
+  });
+
+  function playFrom(start, end) {
+    stopAt = end;
+    audio.currentTime = start;
+    audio.play();
+  }
+  function format(s) { return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`; }
+
+  playButton.addEventListener("click", () => {
+    stopAt = null;
+    if (audio.paused) { if (audio.ended) audio.currentTime = 0; audio.play(); } else audio.pause();
+  });
+  audio.addEventListener("play", () => { playButton.textContent = "❚❚"; playButton.setAttribute("aria-label", "Pause"); });
+  audio.addEventListener("pause", () => { playButton.textContent = "▶"; playButton.setAttribute("aria-label", "Play conversation"); });
+  audio.addEventListener("timeupdate", () => {
+    const now = audio.currentTime;
+    if (stopAt !== null && now >= stopAt) { audio.pause(); stopAt = null; }
+    document.getElementById("fill").style.width = `${(now / (audio.duration || 1)) * 100}%`;
+    document.getElementById("time").textContent = `${format(now)} / ${format(audio.duration || 0)}`;
+    let active = -1;
+    DATA.timings.forEach(t => { if (now >= t.start - 0.05 && now < t.end + 0.25) active = t.line; });
+    rows.forEach((row, i) => {
+      const on = i === active && !audio.paused;
+      if (on && !row.classList.contains("active")) row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      row.classList.toggle("active", on);
+    });
+  });
+  document.getElementById("track").addEventListener("click", e => {
+    const box = e.currentTarget.getBoundingClientRect();
+    stopAt = null;
+    audio.currentTime = ((e.clientX - box.left) / box.width) * (audio.duration || 0);
+  });
+  const speeds = [1, 0.9, 0.75];
+  let speedIndex = 0;
+  document.getElementById("speed").addEventListener("click", e => {
+    speedIndex = (speedIndex + 1) % speeds.length;
+    audio.playbackRate = speeds[speedIndex];
+    e.currentTarget.textContent = `${speeds[speedIndex]}×`;
+  });
+</script>

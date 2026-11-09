@@ -1,0 +1,46 @@
+/* Time-attack turn (see time_attack.js). Lives in a shadow root, so it carries its own colors. */
+.ta {
+  --text: #1e2a44; --muted: rgba(30, 42, 68, 0.65); --card: #ffffff; --border: #e6ddd1;
+  --accent: #c93a57; --track: #efe7dd; --task: rgba(46, 132, 102, 0.1); --hurry: #e5484d;
+  font-family: "IBM Plex Sans KR", sans-serif;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem 1.2rem;
+}
+.ta.dark {
+  --text: #ede8e1; --muted: rgba(237, 232, 225, 0.6); --card: #1b2436; --border: #2c364b;
+  --accent: #f06a84; --track: #2c364b; --task: rgba(92, 197, 158, 0.12);
+}
+.ta-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+.ta-speaker {
+  font-size: 0.8rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 999px;
+  background: rgba(43, 111, 150, 0.16);
+}
+.ta-limit { font-size: 0.85rem; color: var(--muted); }
+.ta-task { padding: 0.6rem 0.9rem; border-radius: 0.7rem; background: var(--task); margin-bottom: 1rem; }
+.ta-stage { display: flex; align-items: center; gap: 1.2rem; }
+.ta-ring { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+.ta-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ta-track, .ta-left { fill: none; stroke-width: 8; }
+.ta-track { stroke: var(--track); }
+.ta-left { stroke: var(--accent); stroke-linecap: round; transition: stroke 0.2s; }
+.ta-hurry .ta-left { stroke: var(--hurry); }
+.ta-button {
+  position: absolute; inset: 14px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--accent); color: #fff; font-size: 1.6rem;
+  box-shadow: 0 6px 18px rgba(201, 58, 87, 0.35);
+}
+.ta-button:disabled { cursor: default; }
+.ta-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+[data-state="recording"] .ta-button { background: var(--hurry); animation: ta-pulse 1.2s ease-out infinite; }
+[data-state="listening"] .ta-button { background: rgba(43, 111, 150, 0.9); }
+[data-state="done"] .ta-button { background: rgba(128, 128, 128, 0.5); box-shadow: none; }
+@keyframes ta-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.55); }
+  70% { box-shadow: 0 0 0 14px rgba(229, 72, 77, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0); }
+}
+@media (prefers-reduced-motion: reduce) { [data-state="recording"] .ta-button { animation: none; } }
+.ta-status { font-size: 1rem; font-weight: 500; }

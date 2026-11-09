@@ -1,0 +1,34 @@
+/* Light theme only (app.py loads this when the light theme is active).
+   The navy banners suit dark mode; on warm paper they look heavy, so in light
+   mode they become a soft camellia-to-sea wash with navy text. */
+
+.hero,
+.side-brand {
+  color: var(--harbor);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(201, 58, 87, 0.22) 0 9%, transparent 9.5%),
+    linear-gradient(135deg, #fff0f2 0%, #fbf3ea 48%, #e5f0f6 100%);
+  border: 1px solid #eadbd0;
+  box-shadow: 0 8px 24px rgba(30, 42, 68, 0.06);
+}
+.side-brand {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(201, 58, 87, 0.22) 0 14%, transparent 14.5%),
+    linear-gradient(140deg, #fff0f2 0%, #fbf3ea 55%, #e5f0f6 100%);
+}
+.hero::after {  /* waves in a light navy tint instead of white */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 46' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C150 6 300 46 450 26 S750 6 900 26 S1100 40 1200 22 V46 H0Z' fill='%232b6f96' fill-opacity='0.07'/%3E%3Cpath d='M0 34 C200 18 350 46 600 32 S1000 18 1200 34 V46 H0Z' fill='%232b6f96' fill-opacity='0.09'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat;
+}
+.hero h1,
+.hero h1 span,
+.side-brand .brand { color: var(--harbor) !important; }
+.hero h1 .accent-word,
+.side-brand .brand span { color: var(--camellia) !important; }
+.hero-kicker { color: var(--sea); opacity: 1; font-weight: 600; }
+.hero p,
+.side-brand .brand-sub { color: var(--harbor); opacity: 0.78; }
+.hero-stats span {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(30, 42, 68, 0.12);
+  color: var(--harbor);
+}

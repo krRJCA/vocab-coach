@@ -1,0 +1,42 @@
+# Look: Busan harbor. Camellia pink (동백꽃, Busan's city flower) on warm paper,
+# with harbor-navy text. A Korean serif for headings and phrases.
+
+[theme]
+font = "IBM Plex Sans KR:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap, sans-serif"
+headingFont = "Gowun Batang:https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap, serif"
+headingFontWeights = [700, 700, 700, 700, 600, 600]
+baseRadius = "0.75rem"
+buttonRadius = "full"
+showWidgetBorder = true
+
+[theme.light]
+primaryColor = "#C93A57"
+backgroundColor = "#FBF8F4"
+secondaryBackgroundColor = "#F3EDE5"
+textColor = "#1E2A44"
+borderColor = "#E6DDD1"
+linkColor = "#2B6F96"
+blueColor = "#2B6F96"
+greenColor = "#1F9D55"
+greenBackgroundColor = "#E3F4E8"
+greenTextColor = "#14692F"
+chartCategoricalColors = ["#C93A57", "#2B6F96", "#D98E2B", "#2E8466"]
+
+[theme.light.sidebar]
+backgroundColor = "#F3EDE5"
+
+[theme.dark]
+primaryColor = "#F06A84"
+backgroundColor = "#111827"
+secondaryBackgroundColor = "#1B2436"
+textColor = "#EDE8E1"
+borderColor = "#2C364B"
+linkColor = "#7CC0E6"
+blueColor = "#7CC0E6"
+greenColor = "#4CC97A"
+greenBackgroundColor = "#173A26"
+greenTextColor = "#8FE3AE"
+chartCategoricalColors = ["#F06A84", "#7CC0E6", "#E9AE57", "#5CC59E"]
+
+[theme.dark.sidebar]
+backgroundColor = "#172033"

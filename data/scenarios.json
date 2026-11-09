@@ -1,0 +1,3257 @@
+[
+ {
+  "id": "cafe",
+  "title_en": "Ordering at a café",
+  "title_ko": "카페에서 주문하기",
+  "icon": "☕",
+  "level": "Beginner",
+  "situation_en": "You walk into a café near campus. Order an iced americano to go, decline the loyalty points, and pay by card.",
+  "dialogue": [
+   {
+    "speaker": "직원",
+    "ko": "어서 오세요. 주문하시겠어요?",
+    "romanization": "Eoseo oseyo. Jumunhasigesseoyo?",
+    "en": "Welcome. Are you ready to order?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아이스 아메리카노 한 잔 주세요.",
+    "romanization": "Aiseu amerikano han jan juseyo.",
+    "en": "One iced americano, please."
+   },
+   {
+    "speaker": "직원",
+    "ko": "사이즈는 어떻게 해 드릴까요?",
+    "romanization": "Saijeuneun eotteoke hae deurilkkayo?",
+    "en": "What size would you like?"
+   },
+   {
+    "speaker": "나",
+    "ko": "큰 사이즈로 주세요. 얼음 조금만 넣어 주세요.",
+    "romanization": "Keun saijeuro juseyo. Eoreum jogeumman neoeo juseyo.",
+    "en": "A large, please. Just a little ice, please."
+   },
+   {
+    "speaker": "직원",
+    "ko": "드시고 가세요?",
+    "romanization": "Deusigo gaseyo?",
+    "en": "For here?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니요, 가져갈게요.",
+    "romanization": "Aniyo, gajyeogalgeyo.",
+    "en": "No, I'll take it to go."
+   },
+   {
+    "speaker": "직원",
+    "ko": "포인트 적립하시겠어요?",
+    "romanization": "Pointeu jeongnipasigesseoyo?",
+    "en": "Would you like to collect points?"
+   },
+   {
+    "speaker": "나",
+    "ko": "적립은 괜찮아요. 카드 돼요?",
+    "romanization": "Jeongnibeun gwaenchanayo. Kadeu dwaeyo?",
+    "en": "No points, thanks. Can I pay by card?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "네, 카드 꽂아 주세요. 영수증 드릴까요?",
+    "romanization": "Ne, kadeu kkoja juseyo. Yeongsujeung deurilkkayo?",
+    "en": "Yes, please insert your card. Would you like the receipt?"
+   },
+   {
+    "speaker": "나",
+    "ko": "영수증은 버려 주세요.",
+    "romanization": "Yeongsujeungeun beoryeo juseyo.",
+    "en": "You can throw the receipt away."
+   },
+   {
+    "speaker": "직원",
+    "ko": "진동벨 울리면 가지러 오세요.",
+    "romanization": "Jindongbel ullimyeon gajireo oseyo.",
+    "en": "Come and pick it up when the buzzer rings."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "cafe_order",
+    "ko": "아이스 아메리카노 한 잔 주세요",
+    "alternatives": [
+     "아이스 아메리카노 하나 주세요"
+    ],
+    "romanization": "aiseu amerikano han jan juseyo",
+    "en": "One iced americano, please.",
+    "register": "해요체",
+    "note": "Pattern: [item] + [number] + [counter] + 주세요. 잔 is the counter for cups and glasses.",
+    "common_mistake": "하나 잔 ✗ → 한 잔 ✓. 하나, 둘, 셋, 넷 shorten to 한, 두, 세, 네 before a counter."
+   },
+   {
+    "id": "cafe_size",
+    "ko": "큰 사이즈로 주세요",
+    "alternatives": [
+     "큰 걸로 주세요"
+    ],
+    "romanization": "keun saijeuro juseyo",
+    "en": "A large size, please.",
+    "register": "해요체",
+    "note": "(으)로 주세요 = 'I'll have it as …'. Use it to choose an option: size, hot or iced, card or cash.",
+    "common_mistake": "Use 로 after a vowel (사이즈로) and 으로 after a consonant (현금으로)."
+   },
+   {
+    "id": "cafe_ice",
+    "ko": "얼음 조금만 넣어 주세요",
+    "alternatives": [
+     "얼음 적게 넣어 주세요"
+    ],
+    "romanization": "eoreum jogeumman neoeo juseyo",
+    "en": "Just a little ice, please.",
+    "register": "해요체",
+    "note": "-만 = 'only/just'. 얼음 빼 주세요 = no ice, 샷 추가해 주세요 = add a shot.",
+    "common_mistake": "넣어 주세요 means 'put in'. Without 조금만 you are asking for ice, not less ice."
+   },
+   {
+    "id": "cafe_togo",
+    "ko": "가져갈게요",
+    "alternatives": [
+     "테이크아웃이요",
+     "포장이요",
+     "포장해 주세요",
+     "테이크아웃할게요"
+    ],
+    "romanization": "gajyeogalgeyo",
+    "en": "I'll take it to go.",
+    "register": "해요체",
+    "note": "Staff usually ask 드시고 가세요? (eating here?). 테이크아웃이요 is also very common in cafés.",
+    "common_mistake": "Answering 네 to 드시고 가세요? means you are staying. Say 아니요, 가져갈게요."
+   },
+   {
+    "id": "cafe_here",
+    "ko": "먹고 갈게요",
+    "alternatives": [
+     "마시고 갈게요",
+     "여기서 먹을게요",
+     "여기서 마실게요"
+    ],
+    "romanization": "meokgo galgeyo",
+    "en": "I'll have it here.",
+    "register": "해요체",
+    "note": "Literally 'I'll eat and then go'. Koreans say 먹고 갈게요 even for drinks.",
+    "common_mistake": "여기 있어요 means 'here you are' (handing something over), not 'for here'."
+   },
+   {
+    "id": "cafe_points",
+    "ko": "적립은 괜찮아요",
+    "alternatives": [
+     "괜찮아요",
+     "아니요, 괜찮아요"
+    ],
+    "romanization": "jeongnibeun gwaenchanayo",
+    "en": "No points, thanks.",
+    "register": "해요체",
+    "note": "괜찮아요 is the polite way to say 'no thank you' to any offer: bag, receipt, points.",
+    "common_mistake": "Saying 아니요 alone sounds abrupt. 괜찮아요 is softer."
+   },
+   {
+    "id": "cafe_card",
+    "ko": "카드 돼요?",
+    "alternatives": [
+     "카드 되나요?",
+     "카드로 할게요"
+    ],
+    "romanization": "kadeu dwaeyo?",
+    "en": "Can I pay by card?",
+    "register": "해요체",
+    "note": "[noun] 돼요? = 'Is … possible?' Works for 와이파이 돼요?, 포장 돼요?, 할인 돼요?",
+    "common_mistake": "되요 ✗ → 돼요 ✓. 돼 is short for 되어. Even many Koreans make this spelling mistake."
+   },
+   {
+    "id": "cafe_receipt",
+    "ko": "영수증은 버려 주세요",
+    "alternatives": [
+     "버려 주세요"
+    ],
+    "romanization": "yeongsujeungeun beoryeo juseyo",
+    "en": "You can throw the receipt away.",
+    "register": "해요체",
+    "note": "Very common in Korea. Staff will ask 영수증 드릴까요? after you pay.",
+    "common_mistake": "버리세요 sounds like an order. -아/어 주세요 is a polite request."
+   },
+   {
+    "id": "cafe_wifi",
+    "ko": "와이파이 비밀번호가 뭐예요?",
+    "alternatives": [
+     "와이파이 비번이 뭐예요?",
+     "와이파이 비밀번호 뭐예요?"
+    ],
+    "romanization": "waipai bimilbeonhoga mwoyeyo?",
+    "en": "What's the Wi-Fi password?",
+    "register": "해요체",
+    "note": "Same pattern for the restroom code: 화장실 비밀번호가 뭐예요? Many cafés lock their restrooms.",
+    "common_mistake": "뭐에요 ✗ → 뭐예요 ✓. After a vowel, use 예요."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "cafe_rp1",
+    "speaker": "직원",
+    "prompt_ko": "어서 오세요. 주문하시겠어요?",
+    "prompt_en": "Welcome. Are you ready to order?",
+    "task_en": "Order one hot latte.",
+    "accepted": [
+     "따뜻한 라떼 한 잔 주세요",
+     "따뜻한 카페라떼 한 잔 주세요",
+     "핫 라떼 한 잔 주세요",
+     "뜨거운 라떼 한 잔 주세요",
+     "따뜻한 라떼 하나 주세요"
+    ],
+    "keywords": [
+     [
+      "따뜻",
+      "뜨거",
+      "핫"
+     ],
+     [
+      "라떼"
+     ]
+    ]
+   },
+   {
+    "id": "cafe_rp2",
+    "speaker": "직원",
+    "prompt_ko": "사이즈는 어떻게 해 드릴까요?",
+    "prompt_en": "What size would you like?",
+    "task_en": "Ask for the small size.",
+    "accepted": [
+     "작은 사이즈로 주세요",
+     "작은 걸로 주세요",
+     "스몰 사이즈로 주세요"
+    ],
+    "keywords": [
+     [
+      "작은",
+      "스몰"
+     ]
+    ]
+   },
+   {
+    "id": "cafe_rp3",
+    "speaker": "직원",
+    "prompt_ko": "드시고 가세요?",
+    "prompt_en": "For here?",
+    "task_en": "Say yes, you'll have it here.",
+    "accepted": [
+     "네, 먹고 갈게요",
+     "먹고 갈게요",
+     "네, 마시고 갈게요",
+     "마시고 갈게요",
+     "네, 여기서 먹을게요"
+    ],
+    "keywords": [
+     [
+      "먹고",
+      "마시고",
+      "여기서"
+     ]
+    ]
+   },
+   {
+    "id": "cafe_rp4",
+    "speaker": "직원",
+    "prompt_ko": "포인트 적립하시겠어요?",
+    "prompt_en": "Would you like to collect points?",
+    "task_en": "Politely decline.",
+    "accepted": [
+     "적립은 괜찮아요",
+     "괜찮아요",
+     "아니요, 괜찮아요"
+    ]
+   },
+   {
+    "id": "cafe_rp5",
+    "speaker": "직원",
+    "prompt_ko": "결제는 어떻게 하시겠어요?",
+    "prompt_en": "How would you like to pay?",
+    "task_en": "Ask if you can pay by card.",
+    "accepted": [
+     "카드 돼요?",
+     "카드 되나요?",
+     "카드로 할게요",
+     "카드로 결제할게요"
+    ],
+    "keywords": [
+     [
+      "카드"
+     ]
+    ]
+   },
+   {
+    "id": "cafe_rp6",
+    "speaker": "직원",
+    "prompt_ko": "영수증 드릴까요?",
+    "prompt_en": "Would you like the receipt?",
+    "task_en": "Ask them to throw it away.",
+    "accepted": [
+     "버려 주세요",
+     "영수증은 버려 주세요",
+     "아니요, 버려 주세요"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "busan",
+  "title_en": "Getting around Busan",
+  "title_ko": "부산에서 길 찾기",
+  "icon": "🚇",
+  "level": "Beginner",
+  "situation_en": "You just arrived at Busan Station and want to go to Haeundae Beach. Ask for directions, top up your transit card, and find the right exit.",
+  "dialogue": [
+   {
+    "speaker": "나",
+    "ko": "저기요, 해운대에 어떻게 가요?",
+    "romanization": "Jeogiyo, haeundaee eotteoke gayo?",
+    "en": "Excuse me, how do I get to Haeundae?"
+   },
+   {
+    "speaker": "행인",
+    "ko": "지하철 타면 돼요. 1호선 타고 서면역에서 2호선으로 갈아타세요.",
+    "romanization": "Jihacheol tamyeon dwaeyo. Ilhoseon tago seomyeonyeogeseo ihoseoneuro garataseyo.",
+    "en": "Take the subway. Take Line 1 and transfer to Line 2 at Seomyeon Station."
+   },
+   {
+    "speaker": "나",
+    "ko": "여기서 멀어요?",
+    "romanization": "Yeogiseo meoreoyo?",
+    "en": "Is it far from here?"
+   },
+   {
+    "speaker": "행인",
+    "ko": "좀 멀어요. 한 시간 정도 걸려요.",
+    "romanization": "Jom meoreoyo. Han sigan jeongdo geollyeoyo.",
+    "en": "It's a bit far. It takes about an hour."
+   },
+   {
+    "speaker": "나",
+    "ko": "감사합니다!",
+    "romanization": "Gamsahamnida!",
+    "en": "Thank you!"
+   },
+   {
+    "speaker": "나",
+    "ko": "(편의점에서) 교통카드 충전해 주세요.",
+    "romanization": "(Pyeonuijeomeseo) Gyotongkadeu chungjeonhae juseyo.",
+    "en": "(At a convenience store) Please top up my transit card."
+   },
+   {
+    "speaker": "직원",
+    "ko": "얼마 해 드릴까요?",
+    "romanization": "Eolma hae deurilkkayo?",
+    "en": "How much?"
+   },
+   {
+    "speaker": "나",
+    "ko": "만 원 충전해 주세요.",
+    "romanization": "Man won chungjeonhae juseyo.",
+    "en": "10,000 won, please."
+   },
+   {
+    "speaker": "나",
+    "ko": "(해운대역에서) 해수욕장에 가려면 몇 번 출구로 나가야 돼요?",
+    "romanization": "(Haeundaeyeogeseo) Haesuyokjange garyeomyeon myeot beon chulguro nagaya dwaeyo?",
+    "en": "(At Haeundae Station) Which exit should I take to get to the beach?"
+   },
+   {
+    "speaker": "역무원",
+    "ko": "5번 출구로 나가서 쭉 가세요.",
+    "romanization": "Obeon chulguro nagaseo jjuk gaseyo.",
+    "en": "Go out Exit 5 and go straight."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "busan_how",
+    "ko": "해운대에 어떻게 가요?",
+    "alternatives": [
+     "해운대 어떻게 가요?"
+    ],
+    "romanization": "haeundaee eotteoke gayo?",
+    "en": "How do I get to Haeundae?",
+    "register": "해요체",
+    "note": "Pattern: [place]에 어떻게 가요? Start with 저기요 (excuse me) to get a stranger's attention.",
+    "common_mistake": "해운대에서 ✗ → 해운대에 ✓. 에서 means 'from/at', 에 means 'to'."
+   },
+   {
+    "id": "busan_far",
+    "ko": "여기서 멀어요?",
+    "alternatives": [
+     "여기에서 멀어요?"
+    ],
+    "romanization": "yeogiseo meoreoyo?",
+    "en": "Is it far from here?",
+    "register": "해요체",
+    "note": "Answer you may hear: 가까워요 (it's close), 걸어서 10분 걸려요 (10 minutes on foot).",
+    "common_mistake": "멀어요 comes from 멀다. Don't confuse it with 많아요 (there are a lot)."
+   },
+   {
+    "id": "busan_line",
+    "ko": "몇 호선 타야 돼요?",
+    "alternatives": [
+     "몇 호선 타요?",
+     "몇 호선 타야 해요?"
+    ],
+    "romanization": "myeot hoseon taya dwaeyo?",
+    "en": "Which line should I take?",
+    "register": "해요체",
+    "note": "Busan has subway lines 1–4. 호선 = line number. -아야/어야 돼요 = 'have to'.",
+    "common_mistake": "Use 타다 (to ride) for subways, buses and taxis, not 가다."
+   },
+   {
+    "id": "busan_transfer",
+    "ko": "어디서 갈아타요?",
+    "alternatives": [
+     "어디에서 갈아타요?",
+     "어디서 갈아타야 돼요?"
+    ],
+    "romanization": "eodiseo garatayo?",
+    "en": "Where do I transfer?",
+    "register": "해요체",
+    "note": "Signs and announcements use 환승 (transfer). 갈아타다 is the everyday verb.",
+    "common_mistake": "Transferring between bus and subway within 30 minutes is free with a transit card. Always tap out (하차 태그)."
+   },
+   {
+    "id": "busan_topup",
+    "ko": "교통카드 충전해 주세요",
+    "alternatives": [
+     "교통카드 충전하고 싶어요",
+     "충전해 주세요"
+    ],
+    "romanization": "gyotongkadeu chungjeonhae juseyo",
+    "en": "Please top up my transit card.",
+    "register": "해요체",
+    "note": "Convenience stores (편의점) and subway machines top up cards. Most stores take cash only for top-ups.",
+    "common_mistake": "충전 also means charging a phone: 휴대폰 충전할 수 있어요? = Can I charge my phone?"
+   },
+   {
+    "id": "busan_amount",
+    "ko": "만 원 충전해 주세요",
+    "alternatives": [
+     "만 원이요",
+     "만 원 해 주세요"
+    ],
+    "romanization": "man won chungjeonhae juseyo",
+    "en": "10,000 won, please (top-up).",
+    "register": "해요체",
+    "note": "Money uses Sino-Korean numbers: 오천 원, 만 원, 이만 원.",
+    "common_mistake": "일만 원 ✗ → 만 원 ✓. Koreans drop 일 before 만, 천 and 백."
+   },
+   {
+    "id": "busan_exit",
+    "ko": "몇 번 출구로 나가야 돼요?",
+    "alternatives": [
+     "몇 번 출구로 나가요?",
+     "몇 번 출구예요?"
+    ],
+    "romanization": "myeot beon chulguro nagaya dwaeyo?",
+    "en": "Which exit should I take?",
+    "register": "해요체",
+    "note": "Station exits are numbered, and maps and friends will say '○번 출구 앞에서 만나요'.",
+    "common_mistake": "출구 = exit, 입구 = entrance. Exit numbers are read with Sino-Korean numbers: 오 번 출구."
+   },
+   {
+    "id": "busan_getoff",
+    "ko": "잠시만요, 내릴게요",
+    "alternatives": [
+     "잠깐만요, 내릴게요",
+     "내릴게요",
+     "저 내릴게요"
+    ],
+    "romanization": "jamsimanyo, naerilgeyo",
+    "en": "Excuse me, I'm getting off!",
+    "register": "해요체",
+    "note": "Use this on a crowded bus or subway. On buses, press the 하차 (stop) bell before your stop.",
+    "common_mistake": "내려요 states a fact. 내릴게요 tells people around you what you are about to do."
+   },
+   {
+    "id": "busan_taxi",
+    "ko": "해운대역으로 가 주세요",
+    "alternatives": [
+     "해운대역 가 주세요",
+     "해운대역까지 가 주세요"
+    ],
+    "romanization": "haeundaeyeogeuro ga juseyo",
+    "en": "(Taxi) Haeundae Station, please.",
+    "register": "해요체",
+    "note": "Pattern: [place](으)로 가 주세요. Showing the address on Kakao Map also works.",
+    "common_mistake": "Use 으로 after a consonant: 해운대역으로, but 서면으로 / 광안리로."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "busan_rp1",
+    "speaker": "행인",
+    "prompt_ko": "네? 무슨 일이세요?",
+    "prompt_en": "Yes? Can I help you?",
+    "task_en": "Ask how to get to Gwangalli (광안리).",
+    "accepted": [
+     "광안리에 어떻게 가요?",
+     "광안리 어떻게 가요?",
+     "광안리 해수욕장에 어떻게 가요?",
+     "저기요, 광안리에 어떻게 가요?"
+    ],
+    "keywords": [
+     [
+      "광안리"
+     ]
+    ]
+   },
+   {
+    "id": "busan_rp2",
+    "speaker": "행인",
+    "prompt_ko": "지하철 타면 돼요. 한 번 갈아타야 돼요.",
+    "prompt_en": "Take the subway. You need to transfer once.",
+    "task_en": "Ask where you transfer.",
+    "accepted": [
+     "어디서 갈아타요?",
+     "어디에서 갈아타요?",
+     "어디서 갈아타야 돼요?"
+    ],
+    "keywords": [
+     [
+      "갈아타",
+      "환승"
+     ]
+    ]
+   },
+   {
+    "id": "busan_rp3",
+    "speaker": "행인",
+    "prompt_ko": "서면역에서 2호선으로 갈아타세요.",
+    "prompt_en": "Transfer to Line 2 at Seomyeon Station.",
+    "task_en": "Ask if it's far from here.",
+    "accepted": [
+     "여기서 멀어요?",
+     "여기에서 멀어요?",
+     "멀어요?"
+    ],
+    "keywords": [
+     [
+      "멀"
+     ]
+    ]
+   },
+   {
+    "id": "busan_rp4",
+    "speaker": "직원",
+    "prompt_ko": "뭐 도와 드릴까요?",
+    "prompt_en": "(Convenience store) How can I help you?",
+    "task_en": "Ask them to top up your transit card.",
+    "accepted": [
+     "교통카드 충전해 주세요",
+     "충전해 주세요",
+     "교통카드 충전하고 싶어요"
+    ],
+    "keywords": [
+     [
+      "충전"
+     ]
+    ]
+   },
+   {
+    "id": "busan_rp5",
+    "speaker": "직원",
+    "prompt_ko": "얼마 해 드릴까요?",
+    "prompt_en": "How much?",
+    "task_en": "Say 20,000 won.",
+    "accepted": [
+     "이만 원 충전해 주세요",
+     "이만 원이요",
+     "이만 원 해 주세요",
+     "2만 원 충전해 주세요",
+     "2만 원이요"
+    ]
+   },
+   {
+    "id": "busan_rp6",
+    "speaker": "버스",
+    "prompt_ko": "(버스 안. 사람이 많아요. 다음 정류장에서 내려야 돼요.)",
+    "prompt_en": "(On a crowded bus. You need to get off at the next stop.)",
+    "task_en": "Politely say you're getting off.",
+    "accepted": [
+     "잠시만요, 내릴게요",
+     "잠깐만요, 내릴게요",
+     "내릴게요",
+     "저 내릴게요"
+    ],
+    "keywords": [
+     [
+      "내리",
+      "내릴",
+      "내려"
+     ]
+    ]
+   },
+   {
+    "id": "busan_rp7",
+    "speaker": "기사님",
+    "prompt_ko": "어디로 가세요?",
+    "prompt_en": "(Taxi driver) Where are you going?",
+    "task_en": "Ask to go to Gwangalli Beach (광안리 해수욕장).",
+    "accepted": [
+     "광안리 해수욕장으로 가 주세요",
+     "광안리 해수욕장 가 주세요",
+     "광안리로 가 주세요",
+     "광안리 가 주세요"
+    ],
+    "keywords": [
+     [
+      "광안리"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "restaurant",
+  "title_en": "Eating at a Korean restaurant",
+  "title_ko": "식당에서 밥 먹기",
+  "icon": "🍜",
+  "level": "Beginner",
+  "situation_en": "Lunch with a friend at a 돼지국밥 (pork soup) restaurant near campus. Get a table for two, order it not spicy, ask for more kimchi, and pay separately.",
+  "dialogue": [
+   {
+    "speaker": "사장님",
+    "ko": "어서 오세요. 몇 분이세요?",
+    "romanization": "Eoseo oseyo. Myeot buniseyo?",
+    "en": "Welcome. How many of you?"
+   },
+   {
+    "speaker": "나",
+    "ko": "두 명이요.",
+    "romanization": "Du myeongiyo.",
+    "en": "Two."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "이쪽으로 앉으세요. 뭐 드릴까요?",
+    "romanization": "Ijjogeuro anjeuseyo. Mwo deurilkkayo?",
+    "en": "Have a seat here. What can I get you?"
+   },
+   {
+    "speaker": "나",
+    "ko": "돼지국밥 두 개 주세요.",
+    "romanization": "Dwaejigukbap du gae juseyo.",
+    "en": "Two pork soups, please."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "맵게 해 드릴까요?",
+    "romanization": "Maepge hae deurilkkayo?",
+    "en": "Would you like it spicy?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니요, 안 맵게 해 주세요.",
+    "romanization": "Aniyo, an maepge hae juseyo.",
+    "en": "No, not spicy, please."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "네, 금방 나와요.",
+    "romanization": "Ne, geumbang nawayo.",
+    "en": "OK, it'll be right out."
+   },
+   {
+    "speaker": "나",
+    "ko": "저기요, 김치 좀 더 주세요.",
+    "romanization": "Jeogiyo, gimchi jom deo juseyo.",
+    "en": "Excuse me, a bit more kimchi, please."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "반찬은 저기서 셀프로 가져가시면 돼요. 맛있게 드세요.",
+    "romanization": "Banchaneun jeogiseo selpeuro gajyeogasimyeon dwaeyo. Masitge deuseyo.",
+    "en": "Side dishes are self-service over there. Enjoy your meal."
+   },
+   {
+    "speaker": "나",
+    "ko": "감사합니다. 잘 먹겠습니다!",
+    "romanization": "Gamsahamnida. Jal meokgetseumnida!",
+    "en": "Thank you. (Let's eat!)"
+   },
+   {
+    "speaker": "사장님",
+    "ko": "계산 같이 해 드릴까요?",
+    "romanization": "Gyesan gachi hae deurilkkayo?",
+    "en": "Shall I put it on one bill?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니요, 따로 계산할 수 있어요?",
+    "romanization": "Aniyo, ttaro gyesanhal su isseoyo?",
+    "en": "No, can we pay separately?"
+   },
+   {
+    "speaker": "사장님",
+    "ko": "네, 한 분씩 카드 주세요.",
+    "romanization": "Ne, han bunssik kadeu juseyo.",
+    "en": "Sure, one card at a time."
+   },
+   {
+    "speaker": "나",
+    "ko": "잘 먹었습니다!",
+    "romanization": "Jal meogeotseumnida!",
+    "en": "Thank you for the meal!"
+   }
+  ],
+  "chunks": [
+   {
+    "id": "restaurant_people",
+    "ko": "두 명이요",
+    "alternatives": [
+     "두 명이에요",
+     "두 명입니다"
+    ],
+    "romanization": "du myeongiyo",
+    "en": "Two people.",
+    "register": "해요체",
+    "note": "명 counts people. Staff ask politely with 분: 몇 분이세요? You answer with 명 for yourselves.",
+    "common_mistake": "둘 명 ✗ → 두 명 ✓ (하나, 둘, 셋 become 한, 두, 세 before a counter)."
+   },
+   {
+    "id": "restaurant_order",
+    "ko": "돼지국밥 두 개 주세요",
+    "alternatives": [
+     "돼지국밥 두 그릇 주세요",
+     "돼지국밥 둘 주세요"
+    ],
+    "romanization": "dwaejigukbap du gae juseyo",
+    "en": "Two pork soups, please.",
+    "register": "해요체",
+    "note": "돼지국밥 is Busan's signature dish. 개 is the all-purpose counter; 그릇 counts bowls.",
+    "common_mistake": "두 돼지국밥 ✗ → 돼지국밥 두 개 ✓: the number comes after the noun."
+   },
+   {
+    "id": "restaurant_mild",
+    "ko": "안 맵게 해 주세요",
+    "alternatives": [
+     "안 맵게 주세요",
+     "덜 맵게 해 주세요"
+    ],
+    "romanization": "an maepge hae juseyo",
+    "en": "Not spicy, please.",
+    "register": "해요체",
+    "note": "-게 해 주세요 = make it …: 안 맵게 (not spicy), 덜 맵게 (less spicy), 맵게 (spicy).",
+    "common_mistake": "맵지 않아 주세요 ✗ → 안 맵게 해 주세요 ✓"
+   },
+   {
+    "id": "restaurant_excuse",
+    "ko": "저기요",
+    "alternatives": [
+     "여기요"
+    ],
+    "romanization": "jeogiyo",
+    "en": "Excuse me! (calling staff)",
+    "register": "해요체",
+    "note": "How you call staff in a Korean restaurant. Many tables also have a call bell.",
+    "common_mistake": "아줌마! can sound rude. 저기요 or 사장님 is safer."
+   },
+   {
+    "id": "restaurant_more",
+    "ko": "김치 좀 더 주세요",
+    "alternatives": [
+     "김치 더 주세요",
+     "김치 좀 더 주실 수 있어요?"
+    ],
+    "romanization": "gimchi jom deo juseyo",
+    "en": "A bit more kimchi, please.",
+    "register": "해요체",
+    "note": "Side dishes (반찬) are free and refillable. 좀 더 = a bit more.",
+    "common_mistake": "김치 하나 더 ✗ for a refill → 김치 좀 더 주세요 ✓"
+   },
+   {
+    "id": "restaurant_before",
+    "ko": "잘 먹겠습니다",
+    "alternatives": [
+     "잘 먹을게요"
+    ],
+    "romanization": "jal meokgetseumnida",
+    "en": "(before eating) Thank you for the food.",
+    "register": "합쇼체",
+    "note": "Said before you start eating, especially when someone treats you.",
+    "common_mistake": "Don't mix it up with 잘 먹었습니다, which is said after the meal."
+   },
+   {
+    "id": "restaurant_bill",
+    "ko": "계산해 주세요",
+    "alternatives": [
+     "계산할게요",
+     "여기 계산이요"
+    ],
+    "romanization": "gyesanhae juseyo",
+    "en": "The bill, please.",
+    "register": "해요체",
+    "note": "In most Korean restaurants you pay at the counter (카운터) on the way out.",
+    "common_mistake": "빌 주세요 ✗: Koreans don't use 'bill'. Say 계산해 주세요."
+   },
+   {
+    "id": "restaurant_separate",
+    "ko": "따로 계산할 수 있어요?",
+    "alternatives": [
+     "따로 계산해 주세요",
+     "따로따로 계산할게요"
+    ],
+    "romanization": "ttaro gyesanhal su isseoyo?",
+    "en": "Can we pay separately?",
+    "register": "해요체",
+    "note": "따로 = separately; 같이 = together. Splitting the bill is common among students.",
+    "common_mistake": "다르게 계산 ✗ → 따로 계산 ✓"
+   },
+   {
+    "id": "restaurant_after",
+    "ko": "잘 먹었습니다",
+    "alternatives": [
+     "잘 먹었어요",
+     "맛있게 먹었습니다"
+    ],
+    "romanization": "jal meogeotseumnida",
+    "en": "Thank you for the meal. (after eating)",
+    "register": "합쇼체",
+    "note": "Said to the staff or owner when you leave. They love hearing it.",
+    "common_mistake": "잘 먹겠습니다 (future) is for before the meal."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "restaurant_rp1",
+    "speaker": "사장님",
+    "prompt_ko": "어서 오세요. 몇 분이세요?",
+    "prompt_en": "Welcome. How many of you?",
+    "task_en": "Say three people.",
+    "accepted": [
+     "세 명이요",
+     "세 명이에요",
+     "세 명입니다"
+    ]
+   },
+   {
+    "id": "restaurant_rp2",
+    "speaker": "사장님",
+    "prompt_ko": "뭐 드릴까요?",
+    "prompt_en": "What can I get you?",
+    "task_en": "Order two 밀면 (Busan's cold wheat noodles).",
+    "accepted": [
+     "밀면 두 개 주세요",
+     "밀면 두 그릇 주세요",
+     "밀면 둘 주세요"
+    ],
+    "keywords": [
+     [
+      "밀면"
+     ]
+    ]
+   },
+   {
+    "id": "restaurant_rp3",
+    "speaker": "사장님",
+    "prompt_ko": "맵게 해 드릴까요?",
+    "prompt_en": "Would you like it spicy?",
+    "task_en": "Ask for it less spicy.",
+    "accepted": [
+     "덜 맵게 해 주세요",
+     "조금만 맵게 해 주세요",
+     "덜 맵게요"
+    ],
+    "keywords": [
+     [
+      "덜",
+      "조금"
+     ]
+    ]
+   },
+   {
+    "id": "restaurant_rp4",
+    "speaker": "식당",
+    "prompt_ko": "(반찬을 다 먹었어요. 직원을 불러야 돼요.)",
+    "prompt_en": "(You finished the side dishes. Call the staff.)",
+    "task_en": "Call the staff and ask for more 깍두기 (radish kimchi).",
+    "accepted": [
+     "저기요, 깍두기 좀 더 주세요",
+     "깍두기 좀 더 주세요",
+     "여기요, 깍두기 더 주세요",
+     "깍두기 더 주세요"
+    ],
+    "keywords": [
+     [
+      "깍두기"
+     ],
+     [
+      "더"
+     ]
+    ]
+   },
+   {
+    "id": "restaurant_rp5",
+    "speaker": "사장님",
+    "prompt_ko": "맛있게 드세요.",
+    "prompt_en": "Enjoy your meal.",
+    "task_en": "Say what Koreans say before eating.",
+    "accepted": [
+     "잘 먹겠습니다",
+     "잘 먹을게요",
+     "감사합니다. 잘 먹겠습니다"
+    ],
+    "keywords": [
+     [
+      "먹겠",
+      "먹을게"
+     ]
+    ]
+   },
+   {
+    "id": "restaurant_rp6",
+    "speaker": "사장님",
+    "prompt_ko": "계산 같이 해 드릴까요?",
+    "prompt_en": "One bill for everyone?",
+    "task_en": "Ask to pay separately.",
+    "accepted": [
+     "따로 계산해 주세요",
+     "따로 계산할게요",
+     "아니요, 따로 계산해 주세요",
+     "따로따로 해 주세요"
+    ],
+    "keywords": [
+     [
+      "따로",
+      "나눠"
+     ]
+    ]
+   },
+   {
+    "id": "restaurant_rp7",
+    "speaker": "사장님",
+    "prompt_ko": "감사합니다. 또 오세요!",
+    "prompt_en": "Thank you. Come again!",
+    "task_en": "Thank them for the meal as you leave.",
+    "accepted": [
+     "잘 먹었습니다",
+     "잘 먹었어요",
+     "맛있게 먹었습니다",
+     "감사합니다. 잘 먹었습니다"
+    ],
+    "keywords": [
+     [
+      "먹었"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "store",
+  "title_en": "At the convenience store",
+  "title_ko": "편의점에서",
+  "icon": "🏪",
+  "level": "Beginner",
+  "situation_en": "At the convenience store under your dorm: get your lunchbox heated, grab a 1+1 deal, say you don't need a bag, pay with your transit card, and pick up a parcel.",
+  "dialogue": [
+   {
+    "speaker": "직원",
+    "ko": "어서 오세요.",
+    "romanization": "Eoseo oseyo.",
+    "en": "Welcome."
+   },
+   {
+    "speaker": "나",
+    "ko": "이 도시락 데워 주실 수 있어요?",
+    "romanization": "I dosirak dewo jusil su isseoyo?",
+    "en": "Could you heat up this lunchbox?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "전자레인지는 저쪽에 있어요. 직접 데우시면 돼요.",
+    "romanization": "Jeonjareinjineun jeojjoge isseoyo. Jikjeop deusimyeon dwaeyo.",
+    "en": "The microwave is over there. You can heat it yourself."
+   },
+   {
+    "speaker": "나",
+    "ko": "아, 네. 이것도 계산해 주세요.",
+    "romanization": "A, ne. Igeotdo gyesanhae juseyo.",
+    "en": "Oh, OK. And this too, please."
+   },
+   {
+    "speaker": "직원",
+    "ko": "이 음료수는 원 플러스 원이에요. 하나 더 가져오세요.",
+    "romanization": "I eumnyosuneun won peulleoseu wonieyo. Hana deo gajyeooseyo.",
+    "en": "This drink is buy one get one free. Grab another one."
+   },
+   {
+    "speaker": "나",
+    "ko": "진짜요? 감사합니다!",
+    "romanization": "Jinjjayo? Gamsahamnida!",
+    "en": "Really? Thank you!"
+   },
+   {
+    "speaker": "직원",
+    "ko": "봉투 필요하세요?",
+    "romanization": "Bongtu piryohaseyo?",
+    "en": "Do you need a bag?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니요, 봉투는 괜찮아요.",
+    "romanization": "Aniyo, bongtuneun gwaenchanayo.",
+    "en": "No, I don't need a bag."
+   },
+   {
+    "speaker": "직원",
+    "ko": "사천이백 원입니다.",
+    "romanization": "Sacheonibaek wonimnida.",
+    "en": "That's 4,200 won."
+   },
+   {
+    "speaker": "나",
+    "ko": "교통카드로 돼요?",
+    "romanization": "Gyotongkadeuro dwaeyo?",
+    "en": "Can I pay with a transit card?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "네, 여기 대 주세요.",
+    "romanization": "Ne, yeogi dae juseyo.",
+    "en": "Yes, tap it here."
+   },
+   {
+    "speaker": "나",
+    "ko": "그리고 택배 찾으러 왔어요.",
+    "romanization": "Geurigo taekbae chajeureo wasseoyo.",
+    "en": "Also, I came to pick up a parcel."
+   },
+   {
+    "speaker": "직원",
+    "ko": "성함이 어떻게 되세요?",
+    "romanization": "Seonghami eotteoke doeseyo?",
+    "en": "May I have your name?"
+   },
+   {
+    "speaker": "나",
+    "ko": "알렉스예요.",
+    "romanization": "Allekseuyeyo.",
+    "en": "It's Alex."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "store_heat",
+    "ko": "데워 주실 수 있어요?",
+    "alternatives": [
+     "데워 주세요",
+     "이거 데워 주세요",
+     "데워 주실 수 있나요?"
+    ],
+    "romanization": "dewo jusil su isseoyo?",
+    "en": "Could you heat it up?",
+    "register": "해요체",
+    "note": "데우다 = to warm up. -아/어 주실 수 있어요? is a polite request. In many stores you use the microwave yourself.",
+    "common_mistake": "데워요 주세요 ✗ → 데워 주세요 ✓"
+   },
+   {
+    "id": "store_microwave",
+    "ko": "전자레인지 어디 있어요?",
+    "alternatives": [
+     "전자레인지는 어디에 있어요?",
+     "전자레인지 어디예요?"
+    ],
+    "romanization": "jeonjareinji eodi isseoyo?",
+    "en": "Where's the microwave?",
+    "register": "해요체",
+    "note": "전자레인지 = microwave. Short questions like this drop 는 and 에 in speech.",
+    "common_mistake": "마이크로웨이브 isn't used in Korean."
+   },
+   {
+    "id": "store_also",
+    "ko": "이것도 계산해 주세요",
+    "alternatives": [
+     "이것도요",
+     "이것도 같이 계산해 주세요"
+    ],
+    "romanization": "igeotdo gyesanhae juseyo",
+    "en": "This too, please.",
+    "register": "해요체",
+    "note": "도 = also. Put an item on the counter and say this.",
+    "common_mistake": "이것 또 ✗ → 이것도 ✓ (도 attaches to the word)."
+   },
+   {
+    "id": "store_oneplus",
+    "ko": "이거 원 플러스 원이에요?",
+    "alternatives": [
+     "원 플러스 원이에요?",
+     "이거 1+1이에요?"
+    ],
+    "romanization": "igeo won peulleoseu wonieyo?",
+    "en": "Is this buy-one-get-one-free?",
+    "register": "해요체",
+    "note": "Korean stores love 1+1 and 2+1 deals. Read them in English: 원 플러스 원, 투 플러스 원.",
+    "common_mistake": "일 더하기 일 ✗: that's maths, not a store deal."
+   },
+   {
+    "id": "store_nobag",
+    "ko": "봉투는 괜찮아요",
+    "alternatives": [
+     "아니요, 괜찮아요",
+     "봉투 필요 없어요"
+    ],
+    "romanization": "bongtuneun gwaenchanayo",
+    "en": "I don't need a bag.",
+    "register": "해요체",
+    "note": "괜찮아요 = 'no thanks'. Bags cost extra (봉투값), so many people bring their own.",
+    "common_mistake": "A plain 아니요 can sound curt. Add 괜찮아요."
+   },
+   {
+    "id": "store_transit",
+    "ko": "교통카드로 돼요?",
+    "alternatives": [
+     "교통카드 돼요?",
+     "교통카드로 결제돼요?"
+    ],
+    "romanization": "gyotongkadeuro dwaeyo?",
+    "en": "Can I pay with a transit card?",
+    "register": "해요체",
+    "note": "Most convenience stores take T-money and Cashbee. (으)로 = by means of: 카드로, 현금으로.",
+    "common_mistake": "교통카드에 돼요? ✗ → 교통카드로 돼요? ✓"
+   },
+   {
+    "id": "store_parcel",
+    "ko": "택배 찾으러 왔어요",
+    "alternatives": [
+     "택배 찾으러 왔습니다",
+     "택배 찾고 싶어요",
+     "택배 가지러 왔어요"
+    ],
+    "romanization": "taekbae chajeureo wasseoyo",
+    "en": "I came to pick up a parcel.",
+    "register": "해요체",
+    "note": "V-(으)러 왔어요 = I came to V. Many students have parcels delivered to a convenience store.",
+    "common_mistake": "택배를 사러 왔어요 ✗ (to buy a parcel) → 찾으러 ✓"
+   },
+   {
+    "id": "store_charger",
+    "ko": "휴대폰 충전기 있어요?",
+    "alternatives": [
+     "충전기 있어요?",
+     "휴대폰 충전기 팔아요?"
+    ],
+    "romanization": "hyudaepon chunjeongi isseoyo?",
+    "en": "Do you have phone chargers?",
+    "register": "해요체",
+    "note": "[Item] 있어요? = 'Do you have/sell …?' in any shop.",
+    "common_mistake": "충전기 가지고 있어요? ✗: that asks whether the clerk personally owns one."
+   },
+   {
+    "id": "store_chopsticks",
+    "ko": "젓가락 주세요",
+    "alternatives": [
+     "젓가락 하나 주세요",
+     "젓가락 있어요?"
+    ],
+    "romanization": "jeotgarak juseyo",
+    "en": "Chopsticks, please.",
+    "register": "해요체",
+    "note": "Ask for 젓가락 (chopsticks) or 숟가락 (spoon) with a lunchbox or cup noodles.",
+    "common_mistake": "젓가락 두 개 for one pair ✗: a pair is just 젓가락 (하나)."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "store_rp1",
+    "speaker": "직원",
+    "prompt_ko": "어서 오세요.",
+    "prompt_en": "Welcome.",
+    "task_en": "Ask where the microwave is.",
+    "accepted": [
+     "전자레인지 어디 있어요?",
+     "전자레인지는 어디에 있어요?",
+     "전자레인지 어디예요?"
+    ],
+    "keywords": [
+     [
+      "전자레인지"
+     ]
+    ]
+   },
+   {
+    "id": "store_rp2",
+    "speaker": "직원",
+    "prompt_ko": "저쪽에 있어요. 다른 건 필요 없으세요?",
+    "prompt_en": "Over there. Need anything else?",
+    "task_en": "Ask if they have phone chargers.",
+    "accepted": [
+     "휴대폰 충전기 있어요?",
+     "충전기 있어요?",
+     "휴대폰 충전기 팔아요?"
+    ],
+    "keywords": [
+     [
+      "충전기"
+     ]
+    ]
+   },
+   {
+    "id": "store_rp3",
+    "speaker": "직원",
+    "prompt_ko": "네, 저기 있어요. 봉투 필요하세요?",
+    "prompt_en": "Yes, over there. Do you need a bag?",
+    "task_en": "Say yes, one bag please.",
+    "accepted": [
+     "네, 봉투 하나 주세요",
+     "봉투 하나 주세요",
+     "네, 하나 주세요",
+     "네, 주세요"
+    ]
+   },
+   {
+    "id": "store_rp4",
+    "speaker": "직원",
+    "prompt_ko": "만 오천 원입니다.",
+    "prompt_en": "That's 15,000 won.",
+    "task_en": "Ask if you can pay with a transit card.",
+    "accepted": [
+     "교통카드로 돼요?",
+     "교통카드 돼요?",
+     "교통카드로 결제돼요?"
+    ],
+    "keywords": [
+     [
+      "교통카드"
+     ]
+    ]
+   },
+   {
+    "id": "store_rp5",
+    "speaker": "직원",
+    "prompt_ko": "네, 여기 대 주세요. 더 필요한 거 있으세요?",
+    "prompt_en": "Yes, tap it here. Anything else?",
+    "task_en": "Say you came to pick up a parcel.",
+    "accepted": [
+     "택배 찾으러 왔어요",
+     "택배 찾으러 왔습니다",
+     "택배 찾고 싶어요",
+     "택배 가지러 왔어요"
+    ],
+    "keywords": [
+     [
+      "택배"
+     ],
+     [
+      "찾",
+      "가지",
+      "받"
+     ]
+    ]
+   },
+   {
+    "id": "store_rp6",
+    "speaker": "직원",
+    "prompt_ko": "이 도시락도 데워 드릴까요?",
+    "prompt_en": "Shall I heat this lunchbox too?",
+    "task_en": "Say yes, please heat it up.",
+    "accepted": [
+     "네, 데워 주세요",
+     "네, 부탁드려요",
+     "네, 데워 주실 수 있어요?"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "market",
+  "title_en": "Shopping at Jagalchi Market",
+  "title_ko": "자갈치시장에서 장보기",
+  "icon": "🐟",
+  "level": "Beginner",
+  "situation_en": "At Jagalchi, Busan's famous fish market: ask the price, get a small discount, buy just half a kilo, and have it sliced to eat upstairs.",
+  "dialogue": [
+   {
+    "speaker": "상인",
+    "ko": "학생, 뭐 찾아요? 오늘 광어 싱싱해요!",
+    "romanization": "Haksaeng, mwo chajayo? Oneul gwangeo singsinghaeyo!",
+    "en": "Student, what are you looking for? The flatfish is fresh today!"
+   },
+   {
+    "speaker": "나",
+    "ko": "이거 얼마예요?",
+    "romanization": "Igeo eolmayeyo?",
+    "en": "How much is this?"
+   },
+   {
+    "speaker": "상인",
+    "ko": "광어는 1킬로에 삼만 원이에요.",
+    "romanization": "Gwangeoneun il killoe samman wonieyo.",
+    "en": "Flatfish is 30,000 won per kilo."
+   },
+   {
+    "speaker": "나",
+    "ko": "좀 비싸요. 조금만 깎아 주세요.",
+    "romanization": "Jom bissayo. Jogeumman kkakka juseyo.",
+    "en": "That's a bit expensive. Could you give me a small discount?"
+   },
+   {
+    "speaker": "상인",
+    "ko": "학생이니까 이만 팔천 원에 줄게요.",
+    "romanization": "Haksaenginikka iman palcheon wone julgeyo.",
+    "en": "Since you're a student, I'll do 28,000 won."
+   },
+   {
+    "speaker": "나",
+    "ko": "감사합니다! 반 킬로만 살 수 있어요?",
+    "romanization": "Gamsahamnida! Ban killoman sal su isseoyo?",
+    "en": "Thanks! Can I buy just half a kilo?"
+   },
+   {
+    "speaker": "상인",
+    "ko": "그럼 만 사천 원이에요.",
+    "romanization": "Geureom man sacheon wonieyo.",
+    "en": "Then it's 14,000 won."
+   },
+   {
+    "speaker": "나",
+    "ko": "회로 먹고 싶어요. 여기서 먹을 수 있어요?",
+    "romanization": "Hoero meokgo sipeoyo. Yeogiseo meogeul su isseoyo?",
+    "en": "I'd like it as sashimi. Can I eat it here?"
+   },
+   {
+    "speaker": "상인",
+    "ko": "회 떠 줄게요. 2층 식당에 가져가면 돼요.",
+    "romanization": "Hoe tteo julgeyo. I cheung sikdange gajyeogamyeon dwaeyo.",
+    "en": "I'll slice it for you. Take it to a restaurant on the second floor."
+   },
+   {
+    "speaker": "나",
+    "ko": "카드 돼요?",
+    "romanization": "Kadeu dwaeyo?",
+    "en": "Do you take cards?"
+   },
+   {
+    "speaker": "상인",
+    "ko": "돼요. 그런데 현금이면 더 좋아요.",
+    "romanization": "Dwaeyo. Geureonde hyeongeumimyeon deo joayo.",
+    "en": "Yes. But cash is better."
+   },
+   {
+    "speaker": "나",
+    "ko": "그럼 현금으로 할게요.",
+    "romanization": "Geureom hyeongeumeuro halgeyo.",
+    "en": "Then I'll pay in cash."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "market_fresh",
+    "ko": "오늘 뭐가 싱싱해요?",
+    "alternatives": [
+     "뭐가 싱싱해요?",
+     "오늘 뭐가 좋아요?"
+    ],
+    "romanization": "oneul mwoga singsinghaeyo?",
+    "en": "What's fresh today?",
+    "register": "해요체",
+    "note": "싱싱하다 = fresh (fish, vegetables). Vendors love this question.",
+    "common_mistake": "신선해요 is also correct but sounds more formal; 싱싱해요 is the market word."
+   },
+   {
+    "id": "market_price",
+    "ko": "이거 얼마예요?",
+    "alternatives": [
+     "이건 얼마예요?",
+     "얼마예요?"
+    ],
+    "romanization": "igeo eolmayeyo?",
+    "en": "How much is this?",
+    "register": "해요체",
+    "note": "Point and ask. 이거 = this (near you), 저거 = that (over there).",
+    "common_mistake": "이거 얼마이에요 ✗ → 얼마예요 ✓"
+   },
+   {
+    "id": "market_kilo",
+    "ko": "1킬로에 얼마예요?",
+    "alternatives": [
+     "한 킬로에 얼마예요?",
+     "킬로에 얼마예요?"
+    ],
+    "romanization": "il killoe eolmayeyo?",
+    "en": "How much per kilo?",
+    "register": "해요체",
+    "note": "N에 = per N: 1킬로에 삼만 원 (30,000 won a kilo). Fish is usually priced by the kilo.",
+    "common_mistake": "1킬로마다 얼마 ✗ (unnatural) → 1킬로에 얼마 ✓"
+   },
+   {
+    "id": "market_expensive",
+    "ko": "좀 비싸요",
+    "alternatives": [
+     "조금 비싸요",
+     "너무 비싸요"
+    ],
+    "romanization": "jom bissayo",
+    "en": "It's a bit expensive.",
+    "register": "해요체",
+    "note": "좀 softens it, a polite way to start bargaining.",
+    "common_mistake": "비싼 이에요 ✗ → 비싸요 ✓ (adjectives conjugate like verbs)."
+   },
+   {
+    "id": "market_discount",
+    "ko": "조금만 깎아 주세요",
+    "alternatives": [
+     "좀 깎아 주세요",
+     "깎아 주세요",
+     "조금만 싸게 해 주세요"
+    ],
+    "romanization": "jogeumman kkakka juseyo",
+    "en": "Could you give me a small discount?",
+    "register": "해요체",
+    "note": "Friendly bargaining is normal at traditional markets, but not in shops or chain stores.",
+    "common_mistake": "할인해 주세요 sounds like asking for an official sale. At the market say 깎아 주세요."
+   },
+   {
+    "id": "market_half",
+    "ko": "반 킬로만 살 수 있어요?",
+    "alternatives": [
+     "반 킬로만 주세요",
+     "반만 살 수 있어요?"
+    ],
+    "romanization": "ban killoman sal su isseoyo?",
+    "en": "Can I buy just half a kilo?",
+    "register": "해요체",
+    "note": "만 = only. -(으)ㄹ 수 있어요? = is it possible to …?",
+    "common_mistake": "반 킬로 만 ✗: 만 (only) attaches to the word: 반 킬로만."
+   },
+   {
+    "id": "market_sashimi",
+    "ko": "회로 먹고 싶어요",
+    "alternatives": [
+     "회로 주세요",
+     "회 떠 주세요"
+    ],
+    "romanization": "hoero meokgo sipeoyo",
+    "en": "I'd like it as sashimi.",
+    "register": "해요체",
+    "note": "(으)로 again: 회로 (as sashimi), 구이로 (grilled). 회를 뜨다 = to slice raw fish.",
+    "common_mistake": "회를 먹고 싶어요 is fine too, but 회로 tells the vendor how to prepare it."
+   },
+   {
+    "id": "market_eathere",
+    "ko": "여기서 먹을 수 있어요?",
+    "alternatives": [
+     "여기서 먹어도 돼요?",
+     "어디서 먹을 수 있어요?"
+    ],
+    "romanization": "yeogiseo meogeul su isseoyo?",
+    "en": "Can I eat it here?",
+    "register": "해요체",
+    "note": "At Jagalchi, vendors slice the fish and restaurants upstairs serve it for a small table charge.",
+    "common_mistake": "여기에서 먹을 수 있어요 is also correct; 여기에 먹을 ✗ (actions take 에서)."
+   },
+   {
+    "id": "market_cash",
+    "ko": "현금으로 할게요",
+    "alternatives": [
+     "현금으로 계산할게요",
+     "현금으로 낼게요"
+    ],
+    "romanization": "hyeongeumeuro halgeyo",
+    "en": "I'll pay in cash.",
+    "register": "해요체",
+    "note": "Small market stalls often prefer cash. 현금 = cash.",
+    "common_mistake": "현금에 할게요 ✗ → 현금으로 ✓"
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "market_rp1",
+    "speaker": "상인",
+    "prompt_ko": "학생, 뭐 찾아요?",
+    "prompt_en": "Student, what are you looking for?",
+    "task_en": "Ask what's fresh today.",
+    "accepted": [
+     "오늘 뭐가 싱싱해요?",
+     "뭐가 싱싱해요?",
+     "뭐가 제일 싱싱해요?",
+     "오늘 뭐가 좋아요?"
+    ],
+    "keywords": [
+     [
+      "싱싱",
+      "좋아",
+      "신선"
+     ]
+    ]
+   },
+   {
+    "id": "market_rp2",
+    "speaker": "상인",
+    "prompt_ko": "오징어가 싱싱해요.",
+    "prompt_en": "The squid is fresh.",
+    "task_en": "Ask how much the squid is per kilo.",
+    "accepted": [
+     "오징어 1킬로에 얼마예요?",
+     "1킬로에 얼마예요?",
+     "한 킬로에 얼마예요?",
+     "오징어 킬로에 얼마예요?"
+    ],
+    "keywords": [
+     [
+      "킬로"
+     ]
+    ]
+   },
+   {
+    "id": "market_rp3",
+    "speaker": "상인",
+    "prompt_ko": "1킬로에 이만 원이에요.",
+    "prompt_en": "20,000 won a kilo.",
+    "task_en": "Say it's a bit expensive and ask for a small discount.",
+    "accepted": [
+     "좀 비싸요. 조금만 깎아 주세요",
+     "조금만 깎아 주세요",
+     "좀 깎아 주세요",
+     "비싸요. 깎아 주세요"
+    ],
+    "keywords": [
+     [
+      "깎",
+      "싸게"
+     ]
+    ]
+   },
+   {
+    "id": "market_rp4",
+    "speaker": "상인",
+    "prompt_ko": "그럼 만 팔천 원에 줄게요.",
+    "prompt_en": "OK, 18,000 won then.",
+    "task_en": "Ask to buy only half a kilo.",
+    "accepted": [
+     "반 킬로만 살 수 있어요?",
+     "반 킬로만 주세요",
+     "반만 살 수 있어요?",
+     "반 킬로만 사도 돼요?"
+    ],
+    "keywords": [
+     [
+      "반"
+     ]
+    ]
+   },
+   {
+    "id": "market_rp5",
+    "speaker": "상인",
+    "prompt_ko": "네, 회로 해 줄까요?",
+    "prompt_en": "OK. Shall I make it sashimi?",
+    "task_en": "Say yes, you'd like it as sashimi.",
+    "accepted": [
+     "네, 회로 주세요",
+     "회로 먹고 싶어요",
+     "네, 회 떠 주세요",
+     "네, 회로 해 주세요"
+    ],
+    "keywords": [
+     [
+      "회"
+     ]
+    ]
+   },
+   {
+    "id": "market_rp6",
+    "speaker": "상인",
+    "prompt_ko": "구천 원이에요. 카드도 돼요.",
+    "prompt_en": "9,000 won. Cards are fine too.",
+    "task_en": "Say you'll pay in cash anyway.",
+    "accepted": [
+     "현금으로 할게요",
+     "현금으로 계산할게요",
+     "현금으로 낼게요"
+    ],
+    "keywords": [
+     [
+      "현금"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "pharmacy",
+  "title_en": "Buying medicine at a pharmacy",
+  "title_ko": "약국에서 약 사기",
+  "icon": "💊",
+  "level": "Beginner",
+  "situation_en": "You have a sore throat and a fever. At a pharmacy near campus, explain your symptoms, say you have no allergies, ask how to take the medicine, and pay.",
+  "dialogue": [
+   {
+    "speaker": "약사",
+    "ko": "어서 오세요. 어디가 아프세요?",
+    "romanization": "Eoseo oseyo. Eodiga apeuseyo?",
+    "en": "Welcome. What's wrong?"
+   },
+   {
+    "speaker": "나",
+    "ko": "감기에 걸린 것 같아요. 목이 아프고 기침이 나요.",
+    "romanization": "Gamgie geollin geot gatayo. Mogi apeugo gichimi nayo.",
+    "en": "I think I caught a cold. My throat hurts and I'm coughing."
+   },
+   {
+    "speaker": "약사",
+    "ko": "열도 있어요?",
+    "romanization": "Yeoldo isseoyo?",
+    "en": "Do you have a fever too?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 어젯밤부터 열이 좀 나요.",
+    "romanization": "Ne, eojetbambuteo yeori jom nayo.",
+    "en": "Yes, I've had a slight fever since last night."
+   },
+   {
+    "speaker": "약사",
+    "ko": "알레르기 있는 약 있으세요?",
+    "romanization": "Allereugi inneun yak isseuseyo?",
+    "en": "Are you allergic to any medicine?"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니요, 알레르기는 없어요.",
+    "romanization": "Aniyo, allereugineun eopseoyo.",
+    "en": "No, I don't have any allergies."
+   },
+   {
+    "speaker": "약사",
+    "ko": "그럼 이 감기약 드세요.",
+    "romanization": "Geureom i gamgiyak deuseyo.",
+    "en": "Then take this cold medicine."
+   },
+   {
+    "speaker": "나",
+    "ko": "하루에 몇 번 먹어요?",
+    "romanization": "Harue myeot beon meogeoyo?",
+    "en": "How many times a day do I take it?"
+   },
+   {
+    "speaker": "약사",
+    "ko": "하루 세 번, 식사 후 30분에 드세요.",
+    "romanization": "Haru se beon, siksa hu samsip bune deuseyo.",
+    "en": "Three times a day, 30 minutes after a meal."
+   },
+   {
+    "speaker": "나",
+    "ko": "이 약 먹으면 졸려요?",
+    "romanization": "I yak meogeumyeon jollyeoyo?",
+    "en": "Will this medicine make me sleepy?"
+   },
+   {
+    "speaker": "약사",
+    "ko": "조금 졸릴 수 있어요. 운전은 하지 마세요.",
+    "romanization": "Jogeum jollil su isseoyo. Unjeoneun haji maseyo.",
+    "en": "It may make you a little sleepy. Don't drive."
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 알겠습니다. 얼마예요?",
+    "romanization": "Ne, algetseumnida. Eolmayeyo?",
+    "en": "OK, I understand. How much is it?"
+   },
+   {
+    "speaker": "약사",
+    "ko": "사천오백 원입니다.",
+    "romanization": "Sacheon-obaek wonimnida.",
+    "en": "4,500 won."
+   },
+   {
+    "speaker": "나",
+    "ko": "카드로 할게요.",
+    "romanization": "Kadeuro halgeyo.",
+    "en": "I'll pay by card."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "pharmacy_cold",
+    "ko": "감기에 걸린 것 같아요",
+    "alternatives": [
+     "감기 걸린 것 같아요",
+     "감기에 걸렸어요"
+    ],
+    "romanization": "gamgie geollin geot gatayo",
+    "en": "I think I caught a cold.",
+    "register": "해요체",
+    "note": "-(으)ㄴ 것 같아요 = 'I think…', softer than a flat statement. 감기에 걸리다 = to catch a cold.",
+    "common_mistake": "감기를 잡았어요 ✗ (translated from English) → 감기에 걸렸어요 ✓"
+   },
+   {
+    "id": "pharmacy_throat",
+    "ko": "목이 아파요",
+    "alternatives": [
+     "목이 좀 아파요",
+     "목이 너무 아파요"
+    ],
+    "romanization": "mogi apayo",
+    "en": "My throat hurts.",
+    "register": "해요체",
+    "note": "[Body part]이/가 아파요: 머리가 아파요 (head), 배가 아파요 (stomach), 이가 아파요 (tooth).",
+    "common_mistake": "제 목이 아파요 isn't wrong, but Korean usually leaves out 'my': 목이 아파요."
+   },
+   {
+    "id": "pharmacy_cough",
+    "ko": "기침이 나요",
+    "alternatives": [
+     "기침을 해요",
+     "기침이 많이 나요"
+    ],
+    "romanization": "gichimi nayo",
+    "en": "I have a cough.",
+    "register": "해요체",
+    "note": "나다 is used for symptoms that 'come out': 기침이 나요, 콧물이 나요 (runny nose), 열이 나요 (fever).",
+    "common_mistake": "기침이 있어요 sounds unnatural → 기침이 나요 or 기침을 해요."
+   },
+   {
+    "id": "pharmacy_fever",
+    "ko": "열이 좀 나요",
+    "alternatives": [
+     "열이 나요",
+     "열이 있어요"
+    ],
+    "romanization": "yeori jom nayo",
+    "en": "I have a slight fever.",
+    "register": "해요체",
+    "note": "좀 (a little) softens it. 어젯밤부터 = since last night.",
+    "common_mistake": "몸이 뜨거워요 ✗ for a fever → 열이 나요 ✓"
+   },
+   {
+    "id": "pharmacy_allergy",
+    "ko": "알레르기는 없어요",
+    "alternatives": [
+     "알레르기 없어요",
+     "아니요, 알레르기는 없어요"
+    ],
+    "romanization": "allereugineun eopseoyo",
+    "en": "I don't have any allergies.",
+    "register": "해요체",
+    "note": "은/는 here means 'as for allergies': no. To name one: 아스피린 알레르기가 있어요.",
+    "common_mistake": "People often say 알러지, but the standard spelling is 알레르기."
+   },
+   {
+    "id": "pharmacy_howoften",
+    "ko": "하루에 몇 번 먹어요?",
+    "alternatives": [
+     "하루에 몇 번 먹어야 돼요?",
+     "하루에 몇 번 먹으면 돼요?"
+    ],
+    "romanization": "harue myeot beon meogeoyo?",
+    "en": "How many times a day do I take it?",
+    "register": "해요체",
+    "note": "Medicine is 'eaten' (먹다) in Korean. The pharmacist says the honorific 드세요 to you. On the label you'll see 식후 30분 (30 minutes after meals), short for 식사 후.",
+    "common_mistake": "약을 마셔요 ✗ for pills → 약을 먹어요 ✓"
+   },
+   {
+    "id": "pharmacy_sleepy",
+    "ko": "이 약 먹으면 졸려요?",
+    "alternatives": [
+     "먹으면 졸려요?",
+     "이 약 졸려요?"
+    ],
+    "romanization": "i yak meogeumyeon jollyeoyo?",
+    "en": "Will this medicine make me sleepy?",
+    "register": "해요체",
+    "note": "-(으)면 = if/when. 졸리다 = to feel sleepy.",
+    "common_mistake": "졸려요 (sleepy) vs 자요 (sleeping): 이 약 먹으면 자요? means 'will I fall asleep?'"
+   },
+   {
+    "id": "pharmacy_price",
+    "ko": "얼마예요?",
+    "alternatives": [
+     "전부 얼마예요?",
+     "다 해서 얼마예요?"
+    ],
+    "romanization": "eolmayeyo?",
+    "en": "How much is it?",
+    "register": "해요체",
+    "note": "Works in every shop. 전부 or 다 해서 = in total.",
+    "common_mistake": "얼마이에요 ✗ → 얼마예요 ✓: after a vowel it's 예요, after a consonant 이에요."
+   },
+   {
+    "id": "pharmacy_card",
+    "ko": "카드로 할게요",
+    "alternatives": [
+     "카드로 계산할게요",
+     "카드로 결제할게요"
+    ],
+    "romanization": "kadeuro halgeyo",
+    "en": "I'll pay by card.",
+    "register": "해요체",
+    "note": "(으)로 할게요 = 'I'll go with…', the same 로/으로 as 큰 사이즈로 주세요. Cash: 현금으로 할게요.",
+    "common_mistake": "카드에 할게요 ✗ → 카드로 할게요 ✓"
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "pharmacy_rp1",
+    "speaker": "약사",
+    "prompt_ko": "어서 오세요. 어디가 아프세요?",
+    "prompt_en": "Welcome. What's wrong?",
+    "task_en": "Say your stomach hurts.",
+    "accepted": [
+     "배가 아파요",
+     "배가 좀 아파요",
+     "배가 너무 아파요",
+     "배탈이 난 것 같아요"
+    ],
+    "keywords": [
+     [
+      "배"
+     ]
+    ]
+   },
+   {
+    "id": "pharmacy_rp2",
+    "speaker": "약사",
+    "prompt_ko": "언제부터 아팠어요?",
+    "prompt_en": "Since when has it hurt?",
+    "task_en": "Say since this morning.",
+    "accepted": [
+     "오늘 아침부터 아팠어요",
+     "아침부터 아팠어요",
+     "오늘 아침부터요",
+     "아침부터요",
+     "오늘 아침부터 아파요"
+    ],
+    "keywords": [
+     [
+      "아침"
+     ]
+    ]
+   },
+   {
+    "id": "pharmacy_rp3",
+    "speaker": "약사",
+    "prompt_ko": "열도 있어요?",
+    "prompt_en": "Do you have a fever too?",
+    "task_en": "Say no, you don't have a fever.",
+    "accepted": [
+     "아니요, 열은 없어요",
+     "열은 없어요",
+     "아니요, 열은 안 나요",
+     "아니요, 없어요"
+    ]
+   },
+   {
+    "id": "pharmacy_rp4",
+    "speaker": "약사",
+    "prompt_ko": "알레르기 있는 약 있으세요?",
+    "prompt_en": "Are you allergic to any medicine?",
+    "task_en": "Say you're allergic to aspirin.",
+    "accepted": [
+     "아스피린 알레르기가 있어요",
+     "아스피린에 알레르기가 있어요",
+     "아스피린 알레르기 있어요"
+    ],
+    "keywords": [
+     [
+      "아스피린"
+     ]
+    ]
+   },
+   {
+    "id": "pharmacy_rp5",
+    "speaker": "약사",
+    "prompt_ko": "그럼 이 약 드세요.",
+    "prompt_en": "Then take this medicine.",
+    "task_en": "Ask how many times a day to take it.",
+    "accepted": [
+     "하루에 몇 번 먹어요?",
+     "하루에 몇 번 먹어야 돼요?",
+     "몇 번 먹어요?",
+     "하루에 몇 번 먹으면 돼요?"
+    ],
+    "keywords": [
+     [
+      "몇 번",
+      "몇번"
+     ]
+    ]
+   },
+   {
+    "id": "pharmacy_rp6",
+    "speaker": "약사",
+    "prompt_ko": "하루 세 번 드세요. 육천 원입니다.",
+    "prompt_en": "Three times a day. That's 6,000 won.",
+    "task_en": "Say you'll pay in cash.",
+    "accepted": [
+     "현금으로 할게요",
+     "현금으로 계산할게요",
+     "현금으로 낼게요"
+    ],
+    "keywords": [
+     [
+      "현금"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "friends",
+  "title_en": "Making a Korean friend",
+  "title_ko": "친구 사귀기",
+  "icon": "🤝",
+  "level": "Beginner",
+  "situation_en": "At a language-exchange meetup on campus, a Korean student, Minji, starts talking to you. Introduce yourself, talk about hobbies, suggest going to Gwangalli together, and swap KakaoTalk.",
+  "dialogue": [
+   {
+    "speaker": "친구",
+    "ko": "안녕하세요! 저는 민지예요.",
+    "romanization": "Annyeonghaseyo! Jeoneun Minjiyeyo.",
+    "en": "Hi! I'm Minji."
+   },
+   {
+    "speaker": "나",
+    "ko": "안녕하세요. 저는 알렉스예요. 만나서 반가워요.",
+    "romanization": "Annyeonghaseyo. Jeoneun Allekseuyeyo. Mannaseo bangawoyo.",
+    "en": "Hi, I'm Alex. Nice to meet you."
+   },
+   {
+    "speaker": "친구",
+    "ko": "어느 나라에서 왔어요?",
+    "romanization": "Eoneu naraeseo wasseoyo?",
+    "en": "Which country are you from?"
+   },
+   {
+    "speaker": "나",
+    "ko": "미국에서 왔어요. 부산외대에서 한국어를 공부하고 있어요.",
+    "romanization": "Migugeseo wasseoyo. Busanoedaeeseo hangugeoreul gongbuhago isseoyo.",
+    "en": "I'm from the US. I'm studying Korean at BUFS."
+   },
+   {
+    "speaker": "친구",
+    "ko": "와, 한국어 정말 잘하시네요!",
+    "romanization": "Wa, hangugeo jeongmal jalhasineyo!",
+    "en": "Wow, your Korean is really good!"
+   },
+   {
+    "speaker": "나",
+    "ko": "아니에요, 아직 많이 부족해요.",
+    "romanization": "Anieyo, ajik mani bujokaeyo.",
+    "en": "Not at all, I still have a lot to learn."
+   },
+   {
+    "speaker": "친구",
+    "ko": "취미가 뭐예요?",
+    "romanization": "Chwimiga mwoyeyo?",
+    "en": "What are your hobbies?"
+   },
+   {
+    "speaker": "나",
+    "ko": "저는 운동하는 걸 좋아해요. 민지 씨는요?",
+    "romanization": "Jeoneun undonghaneun geol joahaeyo. Minji ssineunyo?",
+    "en": "I like working out. How about you, Minji?"
+   },
+   {
+    "speaker": "친구",
+    "ko": "저는 바다 보면서 산책하는 걸 좋아해요.",
+    "romanization": "Jeoneun bada bomyeonseo sanchaekaneun geol joahaeyo.",
+    "en": "I like taking walks by the sea."
+   },
+   {
+    "speaker": "나",
+    "ko": "저도 바다 좋아해요! 우리 같이 광안리에 갈래요?",
+    "romanization": "Jeodo bada joahaeyo! Uri gachi Gwanganrie gallaeyo?",
+    "en": "I like the sea too! Shall we go to Gwangalli together?"
+   },
+   {
+    "speaker": "친구",
+    "ko": "좋아요! 카톡 아이디 알려 줄래요?",
+    "romanization": "Joayo! Katok aidi allyeo jullaeyo?",
+    "en": "Sounds good! Can you give me your KakaoTalk ID?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 제 QR 코드 보여 줄게요.",
+    "romanization": "Ne, je kyuareu kodeu boyeo julgeyo.",
+    "en": "Sure, I'll show you my QR code."
+   },
+   {
+    "speaker": "친구",
+    "ko": "그럼 주말에 연락할게요!",
+    "romanization": "Geureom jumare yeollakalgeyo!",
+    "en": "Then I'll message you this weekend!"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 연락 기다릴게요. 오늘 정말 즐거웠어요.",
+    "romanization": "Ne, yeollak gidarilgeyo. Oneul jeongmal jeulgeowosseoyo.",
+    "en": "OK, I'll wait for your message. I really enjoyed today."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "friends_nice",
+    "ko": "만나서 반가워요",
+    "alternatives": [
+     "반가워요",
+     "만나서 반갑습니다"
+    ],
+    "romanization": "mannaseo bangawoyo",
+    "en": "Nice to meet you.",
+    "register": "해요체",
+    "note": "The friendly way to say it. 처음 뵙겠습니다 is more formal, for older people or business.",
+    "common_mistake": "반가워요 is only for people you meet, not for things you like."
+   },
+   {
+    "id": "friends_country",
+    "ko": "어느 나라에서 왔어요?",
+    "alternatives": [
+     "어느 나라 사람이에요?",
+     "어디에서 왔어요?"
+    ],
+    "romanization": "eoneu naraeseo wasseoyo?",
+    "en": "Which country are you from?",
+    "register": "해요체",
+    "note": "Answer with [country]에서 왔어요: 베트남에서 왔어요, 미국에서 왔어요.",
+    "common_mistake": "어디 나라 ✗ → 어느 나라 ✓: 어느 = which (one of several)."
+   },
+   {
+    "id": "friends_studying",
+    "ko": "한국어를 공부하고 있어요",
+    "alternatives": [
+     "한국어 공부하고 있어요",
+     "한국어를 배우고 있어요"
+    ],
+    "romanization": "hangugeoreul gongbuhago isseoyo",
+    "en": "I'm studying Korean.",
+    "register": "해요체",
+    "note": "-고 있어요 = something going on now or these days. Add where: 부산외대에서 한국어를 공부하고 있어요.",
+    "common_mistake": "한국어를 공부해요 is also fine; 한국어를 공부 있어요 ✗ (missing -하고)."
+   },
+   {
+    "id": "friends_modest",
+    "ko": "아니에요, 아직 많이 부족해요",
+    "alternatives": [
+     "아직 많이 부족해요",
+     "아니에요, 아직 멀었어요"
+    ],
+    "romanization": "anieyo, ajik mani bujokaeyo",
+    "en": "Not at all, I still have a lot to learn.",
+    "register": "해요체",
+    "note": "Koreans often brush off a compliment like this. A simple 감사합니다 is fine too.",
+    "common_mistake": "네, 잘해요 sounds like bragging in Korean, even if you mean 'thanks'."
+   },
+   {
+    "id": "friends_hobby",
+    "ko": "취미가 뭐예요?",
+    "alternatives": [
+     "취미가 어떻게 되세요?",
+     "취미 있어요?"
+    ],
+    "romanization": "chwimiga mwoyeyo?",
+    "en": "What are your hobbies?",
+    "register": "해요체",
+    "note": "A classic first-meeting question. 취미가 어떻게 되세요? is the politer version.",
+    "common_mistake": "뭐예요 (what is it) vs 뭐해요 (what are you doing): 취미가 뭐해요? ✗"
+   },
+   {
+    "id": "friends_like",
+    "ko": "저는 운동하는 걸 좋아해요",
+    "alternatives": [
+     "운동하는 걸 좋아해요",
+     "저는 운동을 좋아해요",
+     "운동 좋아해요"
+    ],
+    "romanization": "jeoneun undonghaneun geol joahaeyo",
+    "en": "I like working out.",
+    "register": "해요체",
+    "note": "V-는 걸 좋아해요 = I like doing V: 사진 찍는 걸, 요리하는 걸, 노래하는 걸 좋아해요.",
+    "common_mistake": "운동해요를 좋아해요 ✗ → 운동하는 걸 좋아해요 ✓: turn the verb into a noun first."
+   },
+   {
+    "id": "friends_together",
+    "ko": "우리 같이 갈래요?",
+    "alternatives": [
+     "같이 갈래요?",
+     "같이 갈까요?"
+    ],
+    "romanization": "uri gachi gallaeyo?",
+    "en": "Shall we go together?",
+    "register": "해요체",
+    "note": "-(으)ㄹ래요? is a friendly invitation. Add a place: 같이 광안리에 갈래요? or an activity: 같이 밥 먹을래요?",
+    "common_mistake": "같이 가고 싶어요? ✗ (asks about their wish) → 같이 갈래요? ✓"
+   },
+   {
+    "id": "friends_kakao",
+    "ko": "카톡 아이디 알려 줄래요?",
+    "alternatives": [
+     "카톡 아이디 알려 주세요",
+     "카톡 아이디 뭐예요?",
+     "카톡 해요?"
+    ],
+    "romanization": "katok aidi allyeo jullaeyo?",
+    "en": "Can you give me your KakaoTalk ID?",
+    "register": "해요체",
+    "note": "Almost everyone in Korea uses KakaoTalk (카톡). Many people just show their QR code.",
+    "common_mistake": "전화번호 줘 ✗: 반말 with someone you just met sounds rude. Stay with 해요체 until they suggest 말 놓을까요?"
+   },
+   {
+    "id": "friends_fun",
+    "ko": "오늘 정말 즐거웠어요",
+    "alternatives": [
+     "오늘 즐거웠어요",
+     "오늘 정말 재미있었어요"
+    ],
+    "romanization": "oneul jeongmal jeulgeowosseoyo",
+    "en": "I really enjoyed today.",
+    "register": "해요체",
+    "note": "A warm way to end a meeting. Answer: 저도요! (Me too!)",
+    "common_mistake": "오늘 정말 즐거워요 (present) when leaving → use the past: 즐거웠어요."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "friends_rp1",
+    "speaker": "친구",
+    "prompt_ko": "안녕하세요! 저는 수아예요.",
+    "prompt_en": "Hi! I'm Sua.",
+    "task_en": "Greet her and say it's nice to meet her.",
+    "accepted": [
+     "안녕하세요. 만나서 반가워요",
+     "만나서 반가워요",
+     "반가워요",
+     "안녕하세요, 반갑습니다",
+     "만나서 반갑습니다"
+    ],
+    "keywords": [
+     [
+      "반가",
+      "반갑"
+     ]
+    ]
+   },
+   {
+    "id": "friends_rp2",
+    "speaker": "친구",
+    "prompt_ko": "어느 나라에서 왔어요?",
+    "prompt_en": "Which country are you from?",
+    "task_en": "Say you're from Vietnam.",
+    "accepted": [
+     "베트남에서 왔어요",
+     "저는 베트남에서 왔어요",
+     "베트남 사람이에요",
+     "베트남이요"
+    ],
+    "keywords": [
+     [
+      "베트남"
+     ]
+    ]
+   },
+   {
+    "id": "friends_rp3",
+    "speaker": "친구",
+    "prompt_ko": "와, 한국어 정말 잘하시네요!",
+    "prompt_en": "Wow, your Korean is really good!",
+    "task_en": "Reply modestly to the compliment.",
+    "accepted": [
+     "아니에요, 아직 많이 부족해요",
+     "아직 많이 부족해요",
+     "아니에요, 아직 멀었어요",
+     "감사합니다. 아직 부족해요",
+     "아니에요"
+    ]
+   },
+   {
+    "id": "friends_rp4",
+    "speaker": "친구",
+    "prompt_ko": "취미가 뭐예요?",
+    "prompt_en": "What are your hobbies?",
+    "task_en": "Say you like taking photos.",
+    "accepted": [
+     "저는 사진 찍는 걸 좋아해요",
+     "사진 찍는 걸 좋아해요",
+     "사진 찍기를 좋아해요",
+     "제 취미는 사진 찍기예요",
+     "사진 찍는 거 좋아해요"
+    ],
+    "keywords": [
+     [
+      "사진"
+     ]
+    ]
+   },
+   {
+    "id": "friends_rp5",
+    "speaker": "친구",
+    "prompt_ko": "저는 요리하는 걸 좋아해요. 부산 맛집도 많이 알아요.",
+    "prompt_en": "I like cooking. I know lots of good restaurants in Busan, too.",
+    "task_en": "Suggest eating together sometime.",
+    "accepted": [
+     "우리 같이 밥 먹을래요?",
+     "같이 밥 먹을래요?",
+     "다음에 같이 밥 먹을래요?",
+     "같이 밥 먹어요",
+     "언제 같이 밥 먹어요"
+    ],
+    "keywords": [
+     [
+      "같이"
+     ],
+     [
+      "밥",
+      "먹"
+     ]
+    ]
+   },
+   {
+    "id": "friends_rp6",
+    "speaker": "친구",
+    "prompt_ko": "좋아요! 연락은 어떻게 할까요?",
+    "prompt_en": "Great! How should we keep in touch?",
+    "task_en": "Ask for her KakaoTalk ID.",
+    "accepted": [
+     "카톡 아이디 알려 줄래요?",
+     "카톡 아이디 알려 주세요",
+     "카톡 아이디 뭐예요?",
+     "카톡 해요?"
+    ],
+    "keywords": [
+     [
+      "카톡",
+      "카카오톡"
+     ]
+    ]
+   },
+   {
+    "id": "friends_rp7",
+    "speaker": "친구",
+    "prompt_ko": "그럼 주말에 연락할게요! 오늘 반가웠어요.",
+    "prompt_en": "Then I'll message you this weekend! It was nice meeting you.",
+    "task_en": "Say you really enjoyed today.",
+    "accepted": [
+     "오늘 정말 즐거웠어요",
+     "저도 오늘 즐거웠어요",
+     "오늘 재미있었어요",
+     "저도 반가웠어요"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "dorm",
+  "title_en": "Life in the dorm",
+  "title_ko": "기숙사 생활",
+  "icon": "🏠",
+  "level": "Beginner",
+  "situation_en": "Your first week in the BUFS dorm: meet your roommate, find the laundry room, ask about quiet hours, and report a broken heater at the dorm office.",
+  "dialogue": [
+   {
+    "speaker": "룸메이트",
+    "ko": "안녕하세요! 새 룸메이트예요?",
+    "romanization": "Annyeonghaseyo! Sae rummeiteuyeyo?",
+    "en": "Hi! Are you the new roommate?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 잘 부탁드려요.",
+    "romanization": "Ne, jal butakdeuryeoyo.",
+    "en": "Yes, nice to meet you. (I look forward to living with you.)"
+   },
+   {
+    "speaker": "룸메이트",
+    "ko": "저는 준호예요. 모르는 거 있으면 물어보세요.",
+    "romanization": "Jeoneun Junhoyeyo. Moreuneun geo isseumyeon mureoboseyo.",
+    "en": "I'm Junho. Ask me if there's anything you don't know."
+   },
+   {
+    "speaker": "나",
+    "ko": "뭐 하나 물어봐도 돼요? 세탁실은 어디에 있어요?",
+    "romanization": "Mwo hana mureobwado dwaeyo? Setaksireun eodie isseoyo?",
+    "en": "Can I ask you something? Where's the laundry room?"
+   },
+   {
+    "speaker": "룸메이트",
+    "ko": "지하 1층에 있어요. 세제는 직접 사야 돼요.",
+    "romanization": "Jiha il cheunge isseoyo. Sejeneun jikjeop saya dwaeyo.",
+    "en": "In basement 1. You have to buy your own detergent."
+   },
+   {
+    "speaker": "나",
+    "ko": "그리고 몇 시부터 조용히 해야 돼요?",
+    "romanization": "Geurigo myeot sibuteo joyonghi haeya dwaeyo?",
+    "en": "And from what time do we need to be quiet?"
+   },
+   {
+    "speaker": "룸메이트",
+    "ko": "밤 열한 시부터요.",
+    "romanization": "Bam yeolhan sibuteoyo.",
+    "en": "From 11 at night."
+   },
+   {
+    "speaker": "나",
+    "ko": "알겠어요. 아, 히터가 안 켜져요.",
+    "romanization": "Algesseoyo. A, hiteoga an kyeojyeoyo.",
+    "en": "Got it. Oh, the heater won't turn on."
+   },
+   {
+    "speaker": "룸메이트",
+    "ko": "1층 행정실에 말하면 고쳐 줘요.",
+    "romanization": "Il cheung haengjeongsire malhamyeon gochyeo jwoyo.",
+    "en": "Tell the office on the first floor and they'll fix it."
+   },
+   {
+    "speaker": "나",
+    "ko": "(행정실에서) 안녕하세요. 302호인데요, 히터가 고장 났어요.",
+    "romanization": "Annyeonghaseyo. Sambaegi-hoindeyo, hiteoga gojang nasseoyo.",
+    "en": "(At the office) Hello. I'm in room 302, and the heater is broken."
+   },
+   {
+    "speaker": "직원",
+    "ko": "언제부터 안 됐어요?",
+    "romanization": "Eonjebuteo an dwaesseoyo?",
+    "en": "Since when has it not worked?"
+   },
+   {
+    "speaker": "나",
+    "ko": "어제부터요. 오늘 고쳐 주실 수 있어요?",
+    "romanization": "Eojebuteoyo. Oneul gochyeo jusil su isseoyo?",
+    "en": "Since yesterday. Could you fix it today?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "네, 오후에 가 볼게요.",
+    "romanization": "Ne, ohue ga bolgeyo.",
+    "en": "Yes, I'll come by this afternoon."
+   },
+   {
+    "speaker": "나",
+    "ko": "감사합니다!",
+    "romanization": "Gamsahamnida!",
+    "en": "Thank you!"
+   }
+  ],
+  "chunks": [
+   {
+    "id": "dorm_nice",
+    "ko": "잘 부탁드려요",
+    "alternatives": [
+     "잘 부탁드립니다",
+     "잘 부탁해요"
+    ],
+    "romanization": "jal butakdeuryeoyo",
+    "en": "Nice to meet you. (I look forward to working with you.)",
+    "register": "해요체",
+    "note": "Said when you start something together: new roommate, coworker, teammate, class.",
+    "common_mistake": "There's no exact English; don't translate it word for word as 'please do well'."
+   },
+   {
+    "id": "dorm_ask",
+    "ko": "뭐 하나 물어봐도 돼요?",
+    "alternatives": [
+     "하나 물어봐도 돼요?",
+     "물어봐도 돼요?"
+    ],
+    "romanization": "mwo hana mureobwado dwaeyo?",
+    "en": "Can I ask you something?",
+    "register": "해요체",
+    "note": "-아/어도 돼요? asks for permission: 들어가도 돼요? (May I come in?)",
+    "common_mistake": "물어봐도 될까요? is even softer; 물어봐요 돼요 ✗."
+   },
+   {
+    "id": "dorm_laundry",
+    "ko": "세탁실은 어디에 있어요?",
+    "alternatives": [
+     "세탁실 어디에 있어요?",
+     "세탁실이 어디예요?"
+    ],
+    "romanization": "setaksireun eodie isseoyo?",
+    "en": "Where's the laundry room?",
+    "register": "해요체",
+    "note": "세탁실 = laundry room, 세탁기 = washing machine, 건조기 = dryer, 세제 = detergent.",
+    "common_mistake": "빨래방 is a paid laundromat outside, not the dorm laundry room."
+   },
+   {
+    "id": "dorm_quiet",
+    "ko": "몇 시부터 조용히 해야 돼요?",
+    "alternatives": [
+     "몇 시부터 조용히 해야 해요?",
+     "밤에 몇 시부터 조용히 해야 돼요?"
+    ],
+    "romanization": "myeot sibuteo joyonghi haeya dwaeyo?",
+    "en": "From what time do we have to be quiet?",
+    "register": "해요체",
+    "note": "-아/어야 돼요 = have to. 부터 = from, 까지 = until.",
+    "common_mistake": "몇 시에서 ✗ for 'from what time' → 몇 시부터 ✓"
+   },
+   {
+    "id": "dorm_noton",
+    "ko": "히터가 안 켜져요",
+    "alternatives": [
+     "히터가 켜지지 않아요",
+     "히터가 안 돼요"
+    ],
+    "romanization": "hiteoga an kyeojyeoyo",
+    "en": "The heater won't turn on.",
+    "register": "해요체",
+    "note": "켜지다 = to come on. 안 켜져요 = it won't come on. Also: 불이 안 켜져요 (the light).",
+    "common_mistake": "히터가 안 켜요 ✗ (that means 'the heater doesn't turn something on')."
+   },
+   {
+    "id": "dorm_broken",
+    "ko": "히터가 고장 났어요",
+    "alternatives": [
+     "히터가 고장났어요",
+     "히터 고장 났어요"
+    ],
+    "romanization": "hiteoga gojang nasseoyo",
+    "en": "The heater is broken.",
+    "register": "해요체",
+    "note": "고장 나다 = to break down (machines): 세탁기, 에어컨, 도어락.",
+    "common_mistake": "히터가 깨졌어요 ✗: 깨지다 means shattered, like glass."
+   },
+   {
+    "id": "dorm_room",
+    "ko": "302호인데요",
+    "alternatives": [
+     "302호예요",
+     "302호입니다"
+    ],
+    "romanization": "sambaegi-hoindeyo",
+    "en": "I'm in room 302 (and …)",
+    "register": "해요체",
+    "note": "-인데요 gives the background before your real point: 302호인데요, 히터가…",
+    "common_mistake": "302 방 ✗ → 302호 ✓ (호 is the counter for room numbers)."
+   },
+   {
+    "id": "dorm_since",
+    "ko": "어제부터요",
+    "alternatives": [
+     "어제부터 안 돼요",
+     "어제부터 안 됐어요"
+    ],
+    "romanization": "eojebuteoyo",
+    "en": "Since yesterday.",
+    "register": "해요체",
+    "note": "부터 = since/from: 오늘 아침부터, 지난주부터.",
+    "common_mistake": "어제에서 ✗ → 어제부터 ✓"
+   },
+   {
+    "id": "dorm_fix",
+    "ko": "오늘 고쳐 주실 수 있어요?",
+    "alternatives": [
+     "오늘 고쳐 주세요",
+     "고쳐 주실 수 있어요?"
+    ],
+    "romanization": "oneul gochyeo jusil su isseoyo?",
+    "en": "Could you fix it today?",
+    "register": "해요체",
+    "note": "고치다 = to fix. -아/어 주실 수 있어요? = polite request.",
+    "common_mistake": "수리해 주세요 is also fine; 고쳐요 주세요 ✗."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "dorm_rp1",
+    "speaker": "룸메이트",
+    "prompt_ko": "안녕하세요! 새 룸메이트예요?",
+    "prompt_en": "Hi! Are you the new roommate?",
+    "task_en": "Say yes, and that you look forward to living together.",
+    "accepted": [
+     "네, 잘 부탁드려요",
+     "네, 잘 부탁드립니다",
+     "잘 부탁드려요",
+     "네, 잘 부탁해요"
+    ],
+    "keywords": [
+     [
+      "부탁"
+     ]
+    ]
+   },
+   {
+    "id": "dorm_rp2",
+    "speaker": "룸메이트",
+    "prompt_ko": "저는 준호예요. 궁금한 거 있어요?",
+    "prompt_en": "I'm Junho. Any questions?",
+    "task_en": "Ask where the laundry room is.",
+    "accepted": [
+     "세탁실은 어디에 있어요?",
+     "세탁실 어디에 있어요?",
+     "세탁실이 어디예요?",
+     "세탁실 어디 있어요?"
+    ],
+    "keywords": [
+     [
+      "세탁실"
+     ]
+    ]
+   },
+   {
+    "id": "dorm_rp3",
+    "speaker": "룸메이트",
+    "prompt_ko": "지하 1층이요. 또 궁금한 거 있어요?",
+    "prompt_en": "Basement 1. Anything else?",
+    "task_en": "Ask from what time you have to be quiet.",
+    "accepted": [
+     "몇 시부터 조용히 해야 돼요?",
+     "몇 시부터 조용히 해야 해요?",
+     "밤에 몇 시부터 조용히 해야 돼요?"
+    ],
+    "keywords": [
+     [
+      "몇 시",
+      "몇시"
+     ],
+     [
+      "조용"
+     ],
+     [
+      "부터"
+     ]
+    ]
+   },
+   {
+    "id": "dorm_rp4",
+    "speaker": "직원",
+    "prompt_ko": "무슨 일이세요?",
+    "prompt_en": "How can I help?",
+    "task_en": "Say you're in room 405 and the washing machine is broken.",
+    "accepted": [
+     "405호인데요, 세탁기가 고장 났어요",
+     "405호예요. 세탁기가 고장 났어요",
+     "세탁기가 고장 났어요. 405호예요"
+    ],
+    "keywords": [
+     [
+      "세탁기"
+     ],
+     [
+      "고장"
+     ]
+    ]
+   },
+   {
+    "id": "dorm_rp5",
+    "speaker": "직원",
+    "prompt_ko": "언제부터 안 됐어요?",
+    "prompt_en": "Since when has it not worked?",
+    "task_en": "Say since this morning.",
+    "accepted": [
+     "오늘 아침부터요",
+     "아침부터요",
+     "오늘 아침부터 안 됐어요",
+     "아침부터 안 돼요"
+    ],
+    "keywords": [
+     [
+      "아침"
+     ]
+    ]
+   },
+   {
+    "id": "dorm_rp6",
+    "speaker": "직원",
+    "prompt_ko": "내일 고쳐 드릴게요.",
+    "prompt_en": "We'll fix it tomorrow.",
+    "task_en": "Politely ask if they can fix it today.",
+    "accepted": [
+     "오늘 고쳐 주실 수 있어요?",
+     "혹시 오늘 고쳐 주실 수 있어요?",
+     "오늘 고쳐 주세요"
+    ],
+    "keywords": [
+     [
+      "오늘"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "office",
+  "title_en": "Getting documents at the campus office",
+  "title_ko": "행정실에서 서류 받기",
+  "icon": "🏫",
+  "level": "Intermediate",
+  "situation_en": "Your visa expires soon, and the immigration office needs a certificate of enrollment. Go to the international office, ask for it in English, find out how long it takes, and ask where to print a transcript.",
+  "dialogue": [
+   {
+    "speaker": "직원",
+    "ko": "안녕하세요. 무엇을 도와드릴까요?",
+    "romanization": "Annyeonghaseyo. Mueoseul dowadeurilkkayo?",
+    "en": "Hello. How can I help you?"
+   },
+   {
+    "speaker": "나",
+    "ko": "재학증명서를 발급받고 싶어요.",
+    "romanization": "Jaehakjeungmyeongseoreul balgeupbatgo sipeoyo.",
+    "en": "I'd like to get a certificate of enrollment."
+   },
+   {
+    "speaker": "직원",
+    "ko": "어디에 내실 거예요?",
+    "romanization": "Eodie naesil geoyeyo?",
+    "en": "Where will you submit it?"
+   },
+   {
+    "speaker": "나",
+    "ko": "비자 연장 때문에 필요해요. 출입국사무소에 내야 돼요.",
+    "romanization": "Bija yeonjang ttaemune piryohaeyo. Churipguksamuso-e naeya dwaeyo.",
+    "en": "I need it for my visa extension. I have to hand it in at the immigration office."
+   },
+   {
+    "speaker": "직원",
+    "ko": "학생증 있으세요?",
+    "romanization": "Haksaengjeung isseuseyo?",
+    "en": "Do you have your student ID?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 여기 있어요.",
+    "romanization": "Ne, yeogi isseoyo.",
+    "en": "Yes, here it is."
+   },
+   {
+    "speaker": "직원",
+    "ko": "한국어로 해 드릴까요, 영어로 해 드릴까요?",
+    "romanization": "Hangugeoro hae deurilkkayo, yeongeoro hae deurilkkayo?",
+    "en": "Would you like it in Korean or in English?"
+   },
+   {
+    "speaker": "나",
+    "ko": "영어로 두 장 부탁드려요. 얼마나 걸려요?",
+    "romanization": "Yeongeoro du jang butakdeuryeoyo. Eolmana geollyeoyo?",
+    "en": "Two copies in English, please. How long does it take?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "5분 정도면 돼요.",
+    "romanization": "O bun jeongdomyeon dwaeyo.",
+    "en": "About five minutes."
+   },
+   {
+    "speaker": "나",
+    "ko": "혹시 성적증명서도 여기서 받을 수 있어요?",
+    "romanization": "Hoksi seongjeokjeungmyeongseodo yeogiseo badeul su isseoyo?",
+    "en": "By any chance, can I get a transcript here too?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "성적증명서는 무인발급기에서 뽑으시면 돼요.",
+    "romanization": "Seongjeokjeungmyeongseoneun muinbalgeupgieseo ppobeusimyeon dwaeyo.",
+    "en": "You can print transcripts at the self-service kiosk."
+   },
+   {
+    "speaker": "나",
+    "ko": "죄송한데, 다시 한번 말씀해 주시겠어요?",
+    "romanization": "Joesonghande, dasi hanbeon malsseumhae jusigesseoyo?",
+    "en": "Sorry, could you say that again?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "무인발급기요. 학생증으로 뽑을 수 있어요.",
+    "romanization": "Muinbalgeupgiyo. Haksaengjeungeuro ppobeul su isseoyo.",
+    "en": "The self-service kiosk. You can print it with your student ID."
+   },
+   {
+    "speaker": "나",
+    "ko": "무인발급기는 어디에 있어요?",
+    "romanization": "Muinbalgeupgineun eodie isseoyo?",
+    "en": "Where is the kiosk?"
+   },
+   {
+    "speaker": "직원",
+    "ko": "1층 엘리베이터 옆에 있어요.",
+    "romanization": "Il cheung elribeiteo yeope isseoyo.",
+    "en": "On the first floor, next to the elevator."
+   },
+   {
+    "speaker": "나",
+    "ko": "감사합니다. 수고하세요.",
+    "romanization": "Gamsahamnida. Sugohaseyo.",
+    "en": "Thank you. Have a good day."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "office_certificate",
+    "ko": "재학증명서를 발급받고 싶어요",
+    "alternatives": [
+     "재학증명서 발급받고 싶어요",
+     "재학증명서를 떼고 싶어요",
+     "재학증명서 떼고 싶어요"
+    ],
+    "romanization": "jaehakjeungmyeongseoreul balgeupbatgo sipeoyo",
+    "en": "I'd like to get a certificate of enrollment.",
+    "register": "해요체",
+    "note": "발급받다 = to have a document issued. In everyday talk people also say 떼다: 재학증명서 떼러 왔어요.",
+    "common_mistake": "재학증명서를 사고 싶어요 ✗: you don't 'buy' a document. Use 발급받다 or 떼다."
+   },
+   {
+    "id": "office_visa",
+    "ko": "비자 연장 때문에 필요해요",
+    "alternatives": [
+     "비자 연장 때문에요",
+     "비자 연장하려고요"
+    ],
+    "romanization": "bija yeonjang ttaemune piryohaeyo",
+    "en": "I need it for my visa extension.",
+    "register": "해요체",
+    "note": "N 때문에 = because of N. Useful for any 'why do you need it?' question.",
+    "common_mistake": "비자를 늘리다 ✗ → 비자를 연장하다 ✓. 늘리다 is for making things bigger or longer, not documents."
+   },
+   {
+    "id": "office_here",
+    "ko": "네, 여기 있어요",
+    "alternatives": [
+     "여기 있어요",
+     "네, 여기 있습니다"
+    ],
+    "romanization": "ne, yeogi isseoyo",
+    "en": "Yes, here it is.",
+    "register": "해요체",
+    "note": "What you say while handing something over: ID, card, money, a form.",
+    "common_mistake": "여기 있으세요 ✗ about your own things: -(으)시- honors the other person, never yourself."
+   },
+   {
+    "id": "office_english",
+    "ko": "영어로 두 장 부탁드려요",
+    "alternatives": [
+     "영어로 두 장 주세요",
+     "영문으로 두 장 부탁드려요"
+    ],
+    "romanization": "yeongeoro du jang butakdeuryeoyo",
+    "en": "Two copies in English, please.",
+    "register": "해요체",
+    "note": "부탁드려요 is politer than 주세요: good at offices. 장 is the counter for sheets of paper.",
+    "common_mistake": "두 개 ✗ → 두 장 ✓ for documents and tickets."
+   },
+   {
+    "id": "office_howlong",
+    "ko": "얼마나 걸려요?",
+    "alternatives": [
+     "시간이 얼마나 걸려요?",
+     "얼마나 걸릴까요?"
+    ],
+    "romanization": "eolmana geollyeoyo?",
+    "en": "How long does it take?",
+    "register": "해요체",
+    "note": "걸리다 = to take (time). The answer often uses 정도 (about): 5분 정도 걸려요.",
+    "common_mistake": "얼마 시간이에요? ✗ → 얼마나 걸려요? ✓"
+   },
+   {
+    "id": "office_transcript",
+    "ko": "성적증명서도 여기서 받을 수 있어요?",
+    "alternatives": [
+     "성적증명서도 받을 수 있어요?",
+     "성적증명서도 여기서 돼요?"
+    ],
+    "romanization": "seongjeokjeungmyeongseodo yeogiseo badeul su isseoyo?",
+    "en": "Can I get a transcript here too?",
+    "register": "해요체",
+    "note": "-(으)ㄹ 수 있어요? asks whether something is possible. 도 = also. 혹시 (by any chance) in front makes it softer.",
+    "common_mistake": "성적표 is the grade report you check online; the official document is 성적증명서."
+   },
+   {
+    "id": "office_repeat",
+    "ko": "다시 한번 말씀해 주시겠어요?",
+    "alternatives": [
+     "다시 한번 말씀해 주세요",
+     "죄송한데 다시 한번 말씀해 주시겠어요?"
+    ],
+    "romanization": "dasi hanbeon malsseumhae jusigesseoyo?",
+    "en": "Could you say that again?",
+    "register": "합쇼체/해요체",
+    "note": "말씀하다 is the honorific of 말하다. Probably the most useful phrase in any office.",
+    "common_mistake": "다시 말해 ✗ (반말, sounds rude to staff) → 다시 한번 말씀해 주시겠어요? ✓"
+   },
+   {
+    "id": "office_kiosk",
+    "ko": "무인발급기는 어디에 있어요?",
+    "alternatives": [
+     "무인발급기 어디에 있어요?",
+     "무인발급기는 어디 있어요?"
+    ],
+    "romanization": "muinbalgeupgineun eodie isseoyo?",
+    "en": "Where is the self-service kiosk?",
+    "register": "해요체",
+    "note": "무인 = unmanned. Many campus documents print from a kiosk with your student ID.",
+    "common_mistake": "어디에서 있어요? ✗ → 어디에 있어요? ✓: location of a thing uses 에, not 에서."
+   },
+   {
+    "id": "office_thanks",
+    "ko": "감사합니다. 수고하세요",
+    "alternatives": [
+     "감사합니다",
+     "수고하세요"
+    ],
+    "romanization": "gamsahamnida. sugohaseyo",
+    "en": "Thank you. Have a good day.",
+    "register": "해요체",
+    "note": "수고하세요 ('keep up the work') is a common goodbye to staff who are still working.",
+    "common_mistake": "Don't say 수고하세요 to a professor or someone senior: it can sound like you are judging their work. Use 감사합니다 or 안녕히 계세요."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "office_rp1",
+    "speaker": "직원",
+    "prompt_ko": "안녕하세요. 무엇을 도와드릴까요?",
+    "prompt_en": "Hello. How can I help you?",
+    "task_en": "Ask for a certificate of enrollment.",
+    "accepted": [
+     "재학증명서를 발급받고 싶어요",
+     "재학증명서 발급받고 싶어요",
+     "재학증명서 떼고 싶어요",
+     "재학증명서가 필요해요",
+     "재학증명서 주세요",
+     "재학증명서 떼러 왔어요",
+     "재학증명서 발급받으러 왔어요"
+    ],
+    "keywords": [
+     [
+      "재학증명서"
+     ]
+    ]
+   },
+   {
+    "id": "office_rp2",
+    "speaker": "직원",
+    "prompt_ko": "어디에 내실 거예요?",
+    "prompt_en": "Where will you submit it?",
+    "task_en": "Say you need it to open a bank account.",
+    "accepted": [
+     "은행 계좌 만들 때 필요해요",
+     "은행 계좌 때문에 필요해요",
+     "통장 만들 때 필요해요",
+     "은행에 내야 돼요",
+     "계좌를 만들려고요"
+    ],
+    "keywords": [
+     [
+      "은행",
+      "통장",
+      "계좌"
+     ]
+    ]
+   },
+   {
+    "id": "office_rp3",
+    "speaker": "직원",
+    "prompt_ko": "학생증 있으세요?",
+    "prompt_en": "Do you have your student ID?",
+    "task_en": "Say yes and hand it over.",
+    "accepted": [
+     "네, 여기 있어요",
+     "여기 있어요",
+     "네, 여기 있습니다"
+    ]
+   },
+   {
+    "id": "office_rp4",
+    "speaker": "직원",
+    "prompt_ko": "한국어로 해 드릴까요, 영어로 해 드릴까요?",
+    "prompt_en": "In Korean or in English?",
+    "task_en": "Ask for one copy in Korean.",
+    "accepted": [
+     "한국어로 한 장 부탁드려요",
+     "한국어로 한 장 주세요",
+     "한국어로 하나 주세요",
+     "한국어로 한 장이요"
+    ],
+    "keywords": [
+     [
+      "한국어",
+      "국문"
+     ]
+    ]
+   },
+   {
+    "id": "office_rp5",
+    "speaker": "직원",
+    "prompt_ko": "신청서 작성하시고 번호표 뽑아서 기다리세요.",
+    "prompt_en": "Fill in the form, take a number ticket and wait.",
+    "task_en": "That was fast. Politely ask them to say it again.",
+    "accepted": [
+     "다시 한번 말씀해 주시겠어요?",
+     "죄송한데 다시 한번 말씀해 주시겠어요?",
+     "다시 한번 말씀해 주세요",
+     "한 번 더 말씀해 주세요"
+    ],
+    "keywords": [
+     [
+      "다시",
+      "한 번 더"
+     ]
+    ]
+   },
+   {
+    "id": "office_rp6",
+    "speaker": "직원",
+    "prompt_ko": "다 됐습니다. 여기 있어요.",
+    "prompt_en": "All done. Here you are.",
+    "task_en": "Thank them and say goodbye politely.",
+    "accepted": [
+     "감사합니다. 수고하세요",
+     "감사합니다",
+     "고맙습니다",
+     "감사합니다. 안녕히 계세요"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "job",
+  "title_en": "Part-time job interview",
+  "title_ko": "아르바이트 면접",
+  "icon": "💼",
+  "level": "Intermediate",
+  "situation_en": "You applied for a part-time job at a café. The owner interviews you. Use formal speech (합쇼체 -습니다/-ㅂ니다): it shows respect in interviews.",
+  "dialogue": [
+   {
+    "speaker": "사장님",
+    "ko": "어서 오세요. 무슨 일로 오셨어요?",
+    "romanization": "Eoseo oseyo. Museun illo osyeosseoyo?",
+    "en": "Welcome. What brings you here?"
+   },
+   {
+    "speaker": "나",
+    "ko": "안녕하세요. 아르바이트 면접 보러 왔습니다.",
+    "romanization": "Annyeonghaseyo. Areubaiteu myeonjeop boreo watseumnida.",
+    "en": "Hello. I'm here for the part-time job interview."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "아, 네. 앉으세요. 자기소개 좀 해 주세요.",
+    "romanization": "A, ne. Anjeuseyo. Jagisogae jom hae juseyo.",
+    "en": "Oh, yes. Have a seat. Please introduce yourself."
+   },
+   {
+    "speaker": "나",
+    "ko": "저는 부산외대에서 한국어를 공부하고 있습니다.",
+    "romanization": "Jeoneun busanoedaeeseo hangugeoreul gongbuhago itseumnida.",
+    "en": "I'm studying Korean at BUFS."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "카페에서 일해 본 적 있어요?",
+    "romanization": "Kapeeseo ilhae bon jeok isseoyo?",
+    "en": "Have you ever worked at a café?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 카페에서 일한 경험이 있습니다.",
+    "romanization": "Ne, kapeeseo ilhan gyeongheomi itseumnida.",
+    "en": "Yes, I have experience working at a café."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "언제 일할 수 있어요?",
+    "romanization": "Eonje ilhal su isseoyo?",
+    "en": "When can you work?"
+   },
+   {
+    "speaker": "나",
+    "ko": "평일에는 저녁에 가능하고, 주말에도 일할 수 있습니다.",
+    "romanization": "Pyeongireneun jeonyeoge ganeunghago, jumaredo ilhal su itseumnida.",
+    "en": "I'm available on weekday evenings, and I can also work on weekends."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "유학생이죠? 아르바이트 허가는 받았어요?",
+    "romanization": "Yuhaksaengijyo? Areubaiteu heoganeun badasseoyo?",
+    "en": "You're an international student, right? Do you have a work permit?"
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 시간제 취업 허가를 받았습니다.",
+    "romanization": "Ne, siganje chwieop heogareul badatseumnida.",
+    "en": "Yes, I have permission for part-time work."
+   },
+   {
+    "speaker": "사장님",
+    "ko": "좋아요. 언제부터 일할 수 있어요?",
+    "romanization": "Joayo. Eonjebuteo ilhal su isseoyo?",
+    "en": "Good. When can you start?"
+   },
+   {
+    "speaker": "나",
+    "ko": "다음 주부터 일할 수 있습니다. 혹시 시급이 어떻게 되나요?",
+    "romanization": "Daeum jubuteo ilhal su itseumnida. Hoksi sigeubi eotteoke doenayo?",
+    "en": "I can start next week. May I ask what the hourly wage is?"
+   },
+   {
+    "speaker": "사장님",
+    "ko": "최저 시급으로 드려요.",
+    "romanization": "Choejeo sigeubeuro deuryeoyo.",
+    "en": "We pay the minimum wage."
+   },
+   {
+    "speaker": "나",
+    "ko": "네, 알겠습니다. 시간 내 주셔서 감사합니다.",
+    "romanization": "Ne, algetseumnida. Sigan nae jusyeoseo gamsahamnida.",
+    "en": "I see. Thank you for your time."
+   }
+  ],
+  "chunks": [
+   {
+    "id": "job_here",
+    "ko": "아르바이트 면접 보러 왔습니다",
+    "alternatives": [
+     "면접 보러 왔습니다",
+     "알바 면접 보러 왔습니다"
+    ],
+    "romanization": "areubaiteu myeonjeop boreo watseumnida",
+    "en": "I'm here for the part-time job interview.",
+    "register": "합쇼체",
+    "note": "-(으)러 왔습니다 = 'I came to …'. 알바 is the casual short form of 아르바이트.",
+    "common_mistake": "면접을 하러 ✗ → 면접 보러 ✓. You 'see' (보다) an interview or exam: 시험 보다, 면접 보다."
+   },
+   {
+    "id": "job_study",
+    "ko": "부산외대에서 한국어를 공부하고 있습니다",
+    "alternatives": [
+     "부산외국어대학교에서 한국어를 공부하고 있습니다"
+    ],
+    "romanization": "busanoedaeeseo hangugeoreul gongbuhago itseumnida",
+    "en": "I'm studying Korean at BUFS.",
+    "register": "합쇼체",
+    "note": "-고 있습니다 = ongoing action ('am studying'). 부산외대 is the common short name.",
+    "common_mistake": "부산외대에 공부 ✗ → 부산외대에서 공부 ✓. Use 에서 for where an action happens."
+   },
+   {
+    "id": "job_experience",
+    "ko": "카페에서 일한 경험이 있습니다",
+    "alternatives": [
+     "카페에서 일해 본 적이 있습니다"
+    ],
+    "romanization": "kapeeseo ilhan gyeongheomi itseumnida",
+    "en": "I have experience working at a café.",
+    "register": "합쇼체",
+    "note": "-(으)ㄴ 경험이 있다 and -아/어 본 적이 있다 both mean 'have done before'.",
+    "common_mistake": "일하는 경험 ✗ → 일한 경험 ✓. Past experience uses the past modifier -(으)ㄴ."
+   },
+   {
+    "id": "job_noexp",
+    "ko": "경험은 없지만 빨리 배우겠습니다",
+    "alternatives": [
+     "경험은 없지만 열심히 배우겠습니다"
+    ],
+    "romanization": "gyeongheomeun eopjiman ppalli baeugetseumnida",
+    "en": "I don't have experience, but I'll learn quickly.",
+    "register": "합쇼체",
+    "note": "-겠습니다 expresses will and sounds committed and polite: 열심히 하겠습니다!",
+    "common_mistake": "Don't stop at 경험이 없습니다. Always add what you will do."
+   },
+   {
+    "id": "job_weekend",
+    "ko": "주말에도 일할 수 있습니다",
+    "alternatives": [
+     "주말에 일할 수 있습니다",
+     "주말에도 가능합니다"
+    ],
+    "romanization": "jumaredo ilhal su itseumnida",
+    "en": "I can also work on weekends.",
+    "register": "합쇼체",
+    "note": "-(으)ㄹ 수 있습니다 = 'can'. 도 = 'also'. Weekend availability is a big plus for employers.",
+    "common_mistake": "가능합니다 alone is fine too, but the full sentence sounds more confident."
+   },
+   {
+    "id": "job_weekday",
+    "ko": "평일에는 저녁에 가능합니다",
+    "alternatives": [
+     "평일 저녁에 가능합니다",
+     "평일에는 저녁에 일할 수 있습니다"
+    ],
+    "romanization": "pyeongireneun jeonyeoge ganeunghamnida",
+    "en": "On weekdays I'm available in the evening.",
+    "register": "합쇼체",
+    "note": "은/는 here contrasts weekdays with weekends. 오전 = morning, 오후 = afternoon.",
+    "common_mistake": "평일 = weekday, 평소 = usually. They sound similar."
+   },
+   {
+    "id": "job_permit",
+    "ko": "시간제 취업 허가를 받았습니다",
+    "alternatives": [
+     "시간제 취업 허가 받았습니다",
+     "아르바이트 허가를 받았습니다"
+    ],
+    "romanization": "siganje chwieop heogareul badatseumnida",
+    "en": "I have permission for part-time work.",
+    "register": "합쇼체",
+    "note": "International students (D-2/D-4 visa) need 시간제 취업 허가 from immigration, applied for through the international office, before working.",
+    "common_mistake": "Working without this permit can affect your visa. Get it before your first shift."
+   },
+   {
+    "id": "job_start",
+    "ko": "다음 주부터 일할 수 있습니다",
+    "alternatives": [
+     "다음 주부터 가능합니다"
+    ],
+    "romanization": "daeum jubuteo ilhal su itseumnida",
+    "en": "I can start from next week.",
+    "register": "합쇼체",
+    "note": "부터 = 'from', 까지 = 'until'. 월요일부터 금요일까지.",
+    "common_mistake": "다음 주에서 ✗ → 다음 주부터 ✓. Time starting points use 부터."
+   },
+   {
+    "id": "job_wage",
+    "ko": "시급이 어떻게 되나요?",
+    "alternatives": [
+     "시급은 어떻게 되나요?",
+     "시급이 얼마예요?"
+    ],
+    "romanization": "sigeubi eotteoke doenayo?",
+    "en": "What is the hourly wage?",
+    "register": "해요체",
+    "note": "N이/가 어떻게 되나요? is a soft, polite way to ask about money, age or schedule. Start with 혹시 (by any chance) to soften it more.",
+    "common_mistake": "시급이 얼마예요? is clear but more direct. In interviews, the softer form sounds better."
+   },
+   {
+    "id": "job_thanks",
+    "ko": "시간 내 주셔서 감사합니다",
+    "alternatives": [
+     "시간 내주셔서 감사합니다"
+    ],
+    "romanization": "sigan nae jusyeoseo gamsahamnida",
+    "en": "Thank you for your time.",
+    "register": "합쇼체",
+    "note": "-아/어 주셔서 감사합니다 = 'thank you for doing …'. 도와주셔서 감사합니다 = thanks for helping.",
+    "common_mistake": "고마워요 is too casual to end an interview. Use 감사합니다."
+   }
+  ],
+  "roleplay": [
+   {
+    "id": "job_rp1",
+    "speaker": "사장님",
+    "prompt_ko": "어서 오세요. 무슨 일로 오셨어요?",
+    "prompt_en": "(Convenience store) Welcome. What brings you here?",
+    "task_en": "Say you came for the part-time job interview.",
+    "accepted": [
+     "아르바이트 면접 보러 왔습니다",
+     "면접 보러 왔습니다",
+     "알바 면접 보러 왔습니다",
+     "안녕하세요, 아르바이트 면접 보러 왔습니다"
+    ],
+    "keywords": [
+     [
+      "면접"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp2",
+    "speaker": "사장님",
+    "prompt_ko": "편의점에서 일해 본 적 있어요?",
+    "prompt_en": "Have you ever worked at a convenience store?",
+    "task_en": "Say you have no experience but will learn quickly.",
+    "accepted": [
+     "경험은 없지만 빨리 배우겠습니다",
+     "아니요, 경험은 없지만 빨리 배우겠습니다",
+     "경험은 없지만 열심히 배우겠습니다",
+     "아니요, 경험은 없지만 열심히 배우겠습니다"
+    ],
+    "keywords": [
+     [
+      "배우",
+      "배울"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp3",
+    "speaker": "사장님",
+    "prompt_ko": "주말에도 일할 수 있어요?",
+    "prompt_en": "Can you work on weekends too?",
+    "task_en": "Say yes, you can work on weekends.",
+    "accepted": [
+     "네, 주말에도 일할 수 있습니다",
+     "주말에도 일할 수 있습니다",
+     "네, 주말에 일할 수 있습니다",
+     "네, 가능합니다",
+     "네, 주말에도 가능합니다"
+    ],
+    "keywords": [
+     [
+      "주말"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp4",
+    "speaker": "사장님",
+    "prompt_ko": "외국인 학생이죠? 일할 수 있는 허가는 있어요?",
+    "prompt_en": "You're an international student, right? Do you have permission to work?",
+    "task_en": "Say yes, you have permission for part-time work.",
+    "accepted": [
+     "네, 시간제 취업 허가를 받았습니다",
+     "시간제 취업 허가를 받았습니다",
+     "네, 시간제 취업 허가 받았습니다",
+     "네, 아르바이트 허가를 받았습니다"
+    ],
+    "keywords": [
+     [
+      "허가"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp5",
+    "speaker": "사장님",
+    "prompt_ko": "언제부터 일할 수 있어요?",
+    "prompt_en": "When can you start?",
+    "task_en": "Say you can start next week.",
+    "accepted": [
+     "다음 주부터 일할 수 있습니다",
+     "다음 주부터 가능합니다",
+     "다음 주부터 일할 수 있어요"
+    ],
+    "keywords": [
+     [
+      "다음 주",
+      "다음주"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp6",
+    "speaker": "사장님",
+    "prompt_ko": "더 궁금한 거 있어요?",
+    "prompt_en": "Any other questions?",
+    "task_en": "Politely ask what the hourly wage is.",
+    "accepted": [
+     "혹시 시급이 어떻게 되나요?",
+     "시급이 어떻게 되나요?",
+     "시급은 어떻게 되나요?",
+     "시급이 얼마예요?"
+    ],
+    "keywords": [
+     [
+      "시급"
+     ]
+    ]
+   },
+   {
+    "id": "job_rp7",
+    "speaker": "사장님",
+    "prompt_ko": "그럼 결과는 내일 연락 드릴게요.",
+    "prompt_en": "Then I'll let you know the result tomorrow.",
+    "task_en": "Thank them for their time.",
+    "accepted": [
+     "시간 내 주셔서 감사합니다",
+     "네, 시간 내 주셔서 감사합니다",
+     "네, 알겠습니다. 시간 내 주셔서 감사합니다",
+     "감사합니다"
+    ],
+    "keywords": [
+     [
+      "감사",
+      "고맙"
+     ]
+    ]
+   }
+  ]
+ }
+]

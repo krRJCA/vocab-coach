@@ -1,0 +1,6 @@
+# Qwen3-ASR runs in its own environment: qwen-asr pins an older transformers than the app uses.
+# Local:  uv venv .venv-qwen --python 3.12 && uv pip install --python .venv-qwen/bin/python -r qwen/requirements.txt
+qwen-asr==0.0.6
+transformers==4.57.6
+torch==2.15.0
+numpy

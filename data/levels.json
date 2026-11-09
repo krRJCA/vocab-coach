@@ -1,0 +1,217 @@
+[
+ {
+  "id": "level1",
+  "title_en": "First weeks in Busan",
+  "title_ko": "부산 첫 달",
+  "level": "Beginner",
+  "cefr": "A1",
+  "description": "Survival Korean for your first weeks: food, getting around, shopping, health, people and home.",
+  "scenarios": [
+   "cafe",
+   "busan",
+   "restaurant",
+   "store",
+   "market",
+   "pharmacy",
+   "friends",
+   "dorm"
+  ],
+  "checkpoint": {
+   "id": "checkpoint1",
+   "icon": "🏁",
+   "title_en": "Checkpoint 1: Your first Saturday in Busan",
+   "title_ko": "부산에서의 첫 토요일",
+   "situation_en": "A whole day out: plan it with a friend, find your way to Jagalchi, shop for fish, eat, and visit a pharmacy at night. One turn from each part of Level 1, in a row.",
+   "test_per_scenario": 2,
+   "pass": 0.8,
+   "roleplay": [
+    {
+     "id": "cp1_rp1",
+     "speaker": "친구",
+     "prompt_ko": "이번 주말에 뭐 해요?",
+     "prompt_en": "What are you doing this weekend?",
+     "task_en": "Suggest going to Jagalchi Market together.",
+     "accepted": [
+      "같이 자갈치시장에 갈래요?",
+      "우리 같이 자갈치시장 갈래요?",
+      "자갈치시장에 같이 가요",
+      "같이 자갈치시장 갈까요?"
+     ],
+     "keywords": [
+      [
+       "자갈치"
+      ],
+      [
+       "같이"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp2",
+     "speaker": "행인",
+     "prompt_ko": "네? 무슨 일이세요?",
+     "prompt_en": "Yes? Can I help you?",
+     "task_en": "Ask how to get to Jagalchi Market.",
+     "accepted": [
+      "자갈치시장에 어떻게 가요?",
+      "저기요, 자갈치시장에 어떻게 가요?",
+      "자갈치시장 어떻게 가요?"
+     ],
+     "keywords": [
+      [
+       "자갈치"
+      ],
+      [
+       "어떻게"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp3",
+     "speaker": "행인",
+     "prompt_ko": "지하철 1호선 타고 자갈치역에서 내리세요.",
+     "prompt_en": "Take subway line 1 and get off at Jagalchi Station.",
+     "task_en": "Ask if it's far from here.",
+     "accepted": [
+      "여기서 멀어요?",
+      "멀어요?",
+      "여기서 많이 멀어요?"
+     ],
+     "keywords": [
+      [
+       "멀"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp4",
+     "speaker": "상인",
+     "prompt_ko": "학생들, 뭐 찾아요? 오늘 고등어 싱싱해요!",
+     "prompt_en": "What are you looking for? The mackerel is fresh today!",
+     "task_en": "Ask how much it is per kilo.",
+     "accepted": [
+      "1킬로에 얼마예요?",
+      "한 킬로에 얼마예요?",
+      "고등어 1킬로에 얼마예요?"
+     ],
+     "keywords": [
+      [
+       "킬로"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp5",
+     "speaker": "사장님",
+     "prompt_ko": "어서 오세요. 몇 분이세요?",
+     "prompt_en": "Welcome. How many of you?",
+     "task_en": "Say two people.",
+     "accepted": [
+      "두 명이요",
+      "두 명이에요",
+      "두 명입니다"
+     ]
+    },
+    {
+     "id": "cp1_rp6",
+     "speaker": "사장님",
+     "prompt_ko": "계산 같이 해 드릴까요?",
+     "prompt_en": "One bill for both?",
+     "task_en": "Ask to pay separately.",
+     "accepted": [
+      "따로 계산해 주세요",
+      "따로 계산할게요",
+      "아니요, 따로 계산해 주세요"
+     ],
+     "keywords": [
+      [
+       "따로",
+       "나눠"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp7",
+     "speaker": "약사",
+     "prompt_ko": "어서 오세요. 어디가 아프세요?",
+     "prompt_en": "(Late at night, at a pharmacy) What's wrong?",
+     "task_en": "Say your stomach hurts.",
+     "accepted": [
+      "배가 아파요",
+      "배가 좀 아파요",
+      "배가 너무 아파요"
+     ],
+     "keywords": [
+      [
+       "배"
+      ]
+     ]
+    },
+    {
+     "id": "cp1_rp8",
+     "speaker": "약사",
+     "prompt_ko": "하루 세 번 드세요. 삼천 원입니다.",
+     "prompt_en": "Three times a day. 3,000 won.",
+     "task_en": "Ask if you can pay with a transit card.",
+     "accepted": [
+      "교통카드로 돼요?",
+      "교통카드 돼요?",
+      "교통카드로 결제돼요?"
+     ],
+     "keywords": [
+      [
+       "교통카드"
+      ]
+     ]
+    }
+   ]
+  },
+  "topik": "1"
+ },
+ {
+  "id": "level2",
+  "title_en": "Settling in",
+  "title_ko": "부산 생활 적응",
+  "level": "Intermediate",
+  "cefr": "A2",
+  "description": "Paperwork, work and longer conversations: offices, banks, phones, hospitals, housing and group projects.",
+  "scenarios": [
+   "office",
+   "job"
+  ],
+  "planned": [
+   {
+    "icon": "🏦",
+    "title_ko": "은행 계좌 만들기",
+    "title_en": "Opening a bank account"
+   },
+   {
+    "icon": "📱",
+    "title_ko": "휴대폰 개통하기",
+    "title_en": "Getting a phone plan"
+   },
+   {
+    "icon": "🏥",
+    "title_ko": "병원 진료 받기",
+    "title_en": "Seeing a doctor"
+   },
+   {
+    "icon": "🏘️",
+    "title_ko": "원룸 구하기",
+    "title_en": "Renting a one-room"
+   },
+   {
+    "icon": "👥",
+    "title_ko": "조별 과제 하기",
+    "title_en": "Group project with classmates"
+   },
+   {
+    "icon": "🔁",
+    "title_ko": "교환·환불하기",
+    "title_en": "Returning or exchanging"
+   }
+  ],
+  "checkpoint": null,
+  "topik": "2"
+ }
+]

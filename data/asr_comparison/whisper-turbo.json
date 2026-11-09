@@ -1,0 +1,42 @@
+{
+ "model": "openai/whisper-large-v3-turbo",
+ "clean": {
+  "passed": 91,
+  "total": 91,
+  "misses": []
+ },
+ "music": {
+  "5 dB": {
+   "right_accepted": 28,
+   "wrong_accepted": 0,
+   "total": 28
+  },
+  "0 dB": {
+   "right_accepted": 26,
+   "wrong_accepted": 0,
+   "total": 28
+  }
+ },
+ "no_speech": {
+  "tone": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "다음 영상에서 만나요."
+  },
+  "fan noise": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "아멘"
+  },
+  "music only": {
+   "accepted": 0,
+   "total": 91,
+   "heard": "Baby, I keep running back to you. Every night I'm dreaming of you."
+  }
+ },
+ "speed": {
+  "seconds_per_answer": 71.7,
+  "load_seconds": 6.1,
+  "peak_memory_gb": 1.8
+ }
+}
