@@ -167,6 +167,46 @@ def wav_to_array(wav_bytes):
     return audio, rate
 
 
+# Noisy surroundings: how loud the background is, and how far the voice stands out from it.
+# Calibrated on the app's phrases mixed with the café music from coach/music.py: a quiet room
+# measures about -55 dBFS with the voice 35-40 dB above it; music 10 dB below the voice gives a
+# 17-18 dB margin, 5 dB below 12-13 dB, and as loud as the voice 8-9 dB. Whisper still passes
+# 27/28 phrases at 5 dB below but only 22/28 at "as loud", so "noisy" is a heads-up that starts
+# early (under 20 dB; a real room with café noise measured -40 dBFS / 16 dB and recognition still
+# worked) and "very noisy" (under 10 dB) means it will probably mishear. A soft voice in a quiet
+# room (-55 dBFS) is never flagged.
+NOISE_FLOOR_DB = -45
+NOISY_MARGIN_DB = 20
+VERY_NOISY_MARGIN_DB = 10
+
+
+def noise_measure(audio):
+    """(background dBFS, voice margin dB, level) of a recording; level is "quiet", "noisy" or
+    "very noisy". Splits it into 30 ms frames: the quietest (15th percentile) are the
+    background, the loudest (95th) the voice."""
+    x = to_array(audio)
+    frame = SR * 30 // 1000
+    count = len(x) // frame
+    if count < 10:
+        return None, None, "quiet"
+    frames = x[: count * frame].reshape(count, frame)
+    db = 20 * np.log10(np.sqrt((frames ** 2).mean(axis=1)) + 1e-9)
+    background, voice = float(np.percentile(db, 15)), float(np.percentile(db, 95))
+    margin = voice - background
+    if background < NOISE_FLOOR_DB:
+        level = "quiet"
+    elif margin < VERY_NOISY_MARGIN_DB:
+        level = "very noisy"
+    else:
+        level = "noisy" if margin < NOISY_MARGIN_DB else "quiet"
+    return background, margin, level
+
+
+def surroundings(audio):
+    """How noisy a recording's surroundings are: "quiet", "noisy" or "very noisy"."""
+    return noise_measure(audio)[2]
+
+
 def to_array(audio):
     """Any recording (WAV/webm/mp3 bytes, a file path, or {"raw", "sampling_rate"}) → 16 kHz floats."""
     if isinstance(audio, dict):

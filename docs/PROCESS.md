@@ -18,7 +18,7 @@ it online, see [DEPLOY.md](DEPLOY.md).
 
 ---
 
-## The journey in 19 steps
+## The journey in 20 steps
 
 ### 1. Choosing the idea
 - Started from the class slide *"From AI Tools to Real Projects"* (five ways to use AI).
@@ -196,6 +196,22 @@ it online, see [DEPLOY.md](DEPLOY.md).
   - **Plan B:** Hugging Face made Docker Spaces paid (PRO) in 2026, so the free version moved to
     **Streamlit Community Cloud** with Whisper small only (~0.8 GB of memory). The app notices
     where it runs and switches by itself; the full three-model version still runs with PRO.
+
+### 20. Smoother, faster, and in Japanese
+- **Time attack glides:** after each answer the page smoothly scrolls the next turn into view
+  (ease-in-out, instant for people who prefer less motion), and the summary slides in at the end.
+- **No waiting for the models:** opening a lesson starts loading the speech and meaning models in
+  the background, while the learner reads the dialogue. The home page loads nothing.
+- **日本語:** a language switch for Japanese students. All app text and all lesson content
+  (meanings, grammar notes, mistakes, role-play tasks) are translated, with notes adapted for
+  Japanese speakers (잔 = 杯, 은/는 = は). It's AI-translated, so it's marked "確認中" until a native
+  speaker checks it.
+- **"Noisy surroundings detected":** every recording is measured for background noise, and a
+  banner warns when the AI is likely to mishear. Calibrated on our café-music tests: quiet rooms
+  and soft voices are never flagged, music 5 dB below the voice always is.
+- **Two bugs caught while testing:** the new banner pushed the lesson tabs down, which made
+  Streamlit jump back to the first tab (fixed with a fixed slot), and background loading slowed
+  the first lesson by ~2 s (fixed by starting it 3 s later).
 
 ---
 

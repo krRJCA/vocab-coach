@@ -51,19 +51,23 @@
 </style>
 
 <div class="bar">
-  <button class="play" id="play" aria-label="Play conversation">▶</button>
+  <button class="play" id="play">▶</button>
   <div class="info">
-    <div class="title">Play the whole conversation</div>
+    <div class="title" id="title"></div>
     <div class="time" id="time">0:00</div>
     <div class="track" id="track"><div class="fill" id="fill"></div></div>
   </div>
-  <button class="speed" id="speed" title="Playback speed">1×</button>
+  <button class="speed" id="speed">1×</button>
 </div>
 <div class="lines" id="lines"></div>
 <audio id="audio" preload="auto"></audio>
 
 <script>
   const DATA = __DATA__;
+  const say = (text) => (DATA.labels && DATA.labels[text]) || text;  // wording in the learner's language
+  document.getElementById("title").textContent = say("Play the whole conversation");
+  document.getElementById("speed").title = say("Playback speed");
+  document.getElementById("play").setAttribute("aria-label", say("Play conversation"));
   if (DATA.dark) document.documentElement.classList.add("dark");
   const audio = document.getElementById("audio");
   audio.src = DATA.audio;
@@ -83,7 +87,7 @@
         ${DATA.romanization ? '<div class="rom"></div>' : ""}
         ${DATA.english ? '<div class="en"></div>' : ""}
       </div>
-      ${t ? '<button class="repeat" title="Repeat this line" aria-label="Repeat this line">🔁</button>' : ""}`;
+      ${t ? `<button class="repeat" title="${say("Repeat this line")}" aria-label="${say("Repeat this line")}">🔁</button>` : ""}`;
     row.querySelector(".speaker").textContent = line.speaker;
     row.querySelector(".ko").textContent = line.ko;
     if (DATA.romanization) row.querySelector(".rom").textContent = line.romanization;
@@ -112,8 +116,8 @@
     stopAt = null;
     if (audio.paused) { if (audio.ended) audio.currentTime = 0; audio.play(); } else audio.pause();
   });
-  audio.addEventListener("play", () => { playButton.textContent = "❚❚"; playButton.setAttribute("aria-label", "Pause"); });
-  audio.addEventListener("pause", () => { playButton.textContent = "▶"; playButton.setAttribute("aria-label", "Play conversation"); });
+  audio.addEventListener("play", () => { playButton.textContent = "❚❚"; playButton.setAttribute("aria-label", say("Pause")); });
+  audio.addEventListener("pause", () => { playButton.textContent = "▶"; playButton.setAttribute("aria-label", say("Play conversation")); });
   audio.addEventListener("timeupdate", () => {
     const now = audio.currentTime;
     if (stopAt !== null && now >= stopAt) { audio.pause(); stopAt = null; }

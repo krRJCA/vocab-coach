@@ -40,8 +40,48 @@ function toBase64(blob) {
   });
 }
 
+// Glide the page so this turn sits in view: their line above, the timer in the middle.
+// Ease-in-out, a bit longer for longer distances; instant if the user prefers less motion,
+// and it lets go as soon as the user scrolls themselves.
+function glideIntoView(element) {
+  const main = document.querySelector('[data-testid="stMain"]');
+  if (!main || !element.isConnected) return;
+  const view = main.getBoundingClientRect();
+  const box = element.getBoundingClientRect();
+  const lead = Math.min(160, view.height * 0.22); // room for their line above the card
+  const fits = box.top - lead >= view.top && box.bottom <= view.bottom - 24;
+  if (fits) return;
+  const start = main.scrollTop;
+  const target = Math.max(0, start + box.top - view.top - lead);
+  const distance = target - start;
+  if (Math.abs(distance) < 4) return;
+  if (document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    main.scrollTop = target;
+    return;
+  }
+  const duration = Math.min(900, Math.max(380, Math.abs(distance) * 0.7));
+  const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  let cancelled = false;
+  const cancel = () => (cancelled = true);
+  main.addEventListener("wheel", cancel, { once: true, passive: true });
+  main.addEventListener("touchstart", cancel, { once: true, passive: true });
+  const began = performance.now();
+  const step = (now) => {
+    if (cancelled) return;
+    const progress = Math.min(1, (now - began) / duration);
+    main.scrollTop = start + distance * ease(progress);
+    if (progress < 1) requestAnimationFrame(step);
+    else {
+      main.removeEventListener("wheel", cancel);
+      main.removeEventListener("touchstart", cancel);
+    }
+  };
+  requestAnimationFrame(step);
+}
+
 export default function (component) {
   const { data, parentElement, setTriggerValue } = component;
+  const say = (text) => (data.labels && data.labels[text]) || text; // wording in the learner's language
   const root = parentElement.querySelector(".ta") || document.createElement("div");
   root.className = "ta" + (data.dark ? " dark" : "");
   if (!root.parentNode) parentElement.appendChild(root);
@@ -50,7 +90,7 @@ export default function (component) {
   root.innerHTML = `
     <div class="ta-head">
       <span class="ta-speaker"></span>
-      <span class="ta-limit">⏱️ ${data.limit.toFixed(1)} s to answer</span>
+      <span class="ta-limit"></span>
     </div>
     <div class="ta-task"></div>
     <div class="ta-stage">
@@ -62,6 +102,7 @@ export default function (component) {
     </div>`;
   root.querySelector(".ta-speaker").textContent = data.speaker;
   root.querySelector(".ta-task").textContent = `🎯 ${data.task}`;
+  root.querySelector(".ta-limit").textContent = `⏱️ ${data.limit_text || `${data.limit.toFixed(1)} s to answer`}`;
   const button = root.querySelector(".ta-button");
   const status = root.querySelector(".ta-status");
   const ring = root.querySelector(".ta-left");
@@ -75,7 +116,7 @@ export default function (component) {
   };
 
   if (finished) {
-    show("✓", "Answer sent. Checking…", "done");
+    show("✓", say("Answer sent. Checking…"), "done");
     button.disabled = true;
     return;
   }
@@ -86,7 +127,7 @@ export default function (component) {
     try {
       stream = await microphone();
     } catch (error) {
-      show("🎙️", "Microphone blocked. Allow it in the browser and try again.", "idle");
+      show("🎙️", say("Microphone blocked. Allow it in the browser and try again."), "idle");
       button.disabled = false;
       return;
     }
@@ -115,7 +156,7 @@ export default function (component) {
     recorder.start();
     const started = performance.now();
     let firstSpeech = null, speechTime = 0, lastLoud = null, last = started;
-    show("🎙️", "Your turn: speak now!", "recording");
+    show("🎙️", say("Your turn: speak now!"), "recording");
 
     await new Promise((resolve) => {
       const tick = (now) => {
@@ -144,7 +185,7 @@ export default function (component) {
     beep(context, 520);
     context.close();
     const spoke = speechTime >= MIN_SPEECH;
-    show(spoke ? "✓" : "⏰", spoke ? "Got it. Checking…" : "Time's up!", "done");
+    show(spoke ? "✓" : "⏰", spoke ? say("Got it. Checking…") : say("Time's up!"), "done");
     shared.done.add(data.turn_id);
     const audio = spoke ? await toBase64(new Blob(chunks, { type: recorder.mimeType })) : "";
     setTriggerValue("answer", {
@@ -152,13 +193,17 @@ export default function (component) {
       audio,
       spoke,
       latency: firstSpeech === null ? null : Math.round(firstSpeech * 10) / 10,
+      mime: (recorder.mimeType || "audio/webm").split(";")[0], // so the app can play it back
     });
   }
+
+  // wait a moment for Streamlit to finish drawing the turn, then glide to it
+  setTimeout(() => glideIntoView(root), 120);
 
   if (data.autostart) {
     run();
   } else {
-    show("▶", "Press start. Their line plays, then you have to answer in time.", "idle");
+    show("▶", say("Press start. Their line plays, then you have to answer in time."), "idle");
     button.onclick = run;
   }
 }

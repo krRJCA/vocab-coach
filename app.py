@@ -23,7 +23,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from coach import learning_tests, semantic, speech, srs, survey
+from coach import learning_tests, semantic, speech, srs, survey, warmup
+from coach.i18n import LANGUAGES, L, T, add_japanese, lang
 from coach.checker import check, check_spoken
 
 try:  # dev-only tools (Voice check) live in dev/voice_check.py, which is never deployed
@@ -51,6 +52,7 @@ def load_scenarios():
 SCENARIOS = load_scenarios()
 SCENARIO_BY_ID = {scenario["id"]: scenario for scenario in SCENARIOS}
 LEVELS = json.loads((DATA_DIR / "levels.json").read_text(encoding="utf-8"))
+add_japanese(SCENARIOS, LEVELS)  # Japanese fields from data/scenarios_ja.json
 LEVEL_NUMBER = {sid: number for number, level in enumerate(LEVELS, 1) for sid in level["scenarios"]}
 CHECKPOINT_BY_ID = {level["checkpoint"]["id"]: (number, level)
                     for number, level in enumerate(LEVELS, 1) if level.get("checkpoint")}
@@ -152,7 +154,7 @@ def load_from_browser():
     result = BROWSER_STORE(key="browser-load", data={"mode": "load"}, on_loaded_change=lambda: None)
     saved = getattr(result, "loaded", None)
     if saved is None:  # the browser answers on the next run
-        st.caption("Loading your progress…")
+        st.caption(T("Loading your progress…"))
         st.stop()
     state.progress = saved.get("progress") or {}
     state.tests = saved.get("tests") or {}
@@ -237,9 +239,11 @@ def conversation_player(scenario, romanization, english):
     data = {
         "audio": "data:audio/mpeg;base64," + base64.b64encode(track.read_bytes()).decode(),
         "timings": json.loads(timings.read_text(encoding="utf-8")),
-        "lines": scenario["dialogue"],
+        "lines": [{**line, "en": L(line, "en")} for line in scenario["dialogue"]],
         "romanization": romanization,
         "english": english,
+        "labels": {text: T(text) for text in ("Play the whole conversation", "Play conversation", "Pause",
+                                              "Repeat this line", "Playback speed")},
         "dark": st.context.theme.type == "dark",
     }
     markup = PLAYER_PATH.read_text(encoding="utf-8").replace(
@@ -249,8 +253,9 @@ def conversation_player(scenario, romanization, english):
     return True
 
 
-@st.cache_resource(show_spinner="Loading the AI model (first time only)…")
+@st.cache_resource(show_spinner=False)
 def ai_model():
+    warmup.wait("meaning")  # a lesson may already be loading it in the background
     return semantic.load_model()
 
 
@@ -262,12 +267,23 @@ def asr_engine():
 
 @st.cache_resource(show_spinner=False)
 def _load_speech_model(engine):
+    warmup.wait(f"speech-{engine}")  # a lesson may already be loading it in the background
     return speech.load_model(engine)
+
+
+def preload_models():
+    """Start loading the models this learner will need, in the background (see coach/warmup.py):
+    the speech model only if they answer by speaking, the meaning model only if it's on."""
+    if st.session_state.get("answer_mode", SPEAK) == SPEAK and speech.is_available(asr_engine()):
+        engine = asr_engine()
+        warmup.preload(f"speech-{engine}", lambda: speech.load_model(engine))
+    if st.session_state.get("ai_check", True) and semantic.is_available():
+        warmup.preload("meaning", semantic.load_model)
 
 
 def speech_model(engine=None):
     engine = engine or asr_engine()
-    with st.spinner(f"Loading {speech.ENGINES[engine]['label']} (first time only)…"):
+    with st.spinner(T("Loading {model} (first time only)…", model=speech.ENGINES[engine]['label'])):
         return _load_speech_model(engine)
 
 
@@ -299,40 +315,150 @@ def answer_input(key, label, hint=""):
     function that re-runs that model with the hint.
     """
     if st.session_state.get("answer_mode") == SPEAK:
-        recording = st.audio_input(f"{label}: tap the mic and say it in Korean", key=f"{key}-audio")
+        recording = st.audio_input(T("{label}: tap the mic and say it in Korean", label=label), key=f"{key}-audio")
         if recording is None:
             return None
         # The recorder keeps its recording, so every later click reruns this:
         # transcribe each recording once and reuse the text.
         audio = recording.getvalue()
+        keep_recording(key, audio, recording.type or "audio/wav")
         heard = st.session_state.get(f"{key}-heard")
         if not heard or heard["audio"] != (hash(audio), asr_engine()):
             heard = {"audio": (hash(audio), asr_engine())}
             speech_model()
-            with st.spinner("Listening…"):
+            with st.spinner(T("Listening…")):
                 heard["plain"] = transcribe(audio)
+            note_surroundings(audio)
             st.session_state[f"{key}-heard"] = heard
 
         def hinted():
             if "hinted" not in heard:
-                with st.spinner("Listening again more closely…"):
+                with st.spinner(T("Listening again more closely…")):
                     heard["hinted"] = transcribe(audio, hint=hint)
             return heard["hinted"]
 
         if not heard["plain"]:
-            st.warning("I couldn't hear anything. Try recording again, a little louder.")
+            if st.session_state.get("surroundings") in NOISE_MESSAGES:
+                st.warning(T("I couldn't hear your words over the background noise. Try a quieter spot, or hold "
+                             "the microphone closer."))
+            else:
+                st.warning(T("I couldn't hear anything. Try recording again, a little louder."))
             return None
         return heard["plain"], asr_engine(), hinted  # "spoken" = the model that heard it
 
     with st.form(key):
         text = st.text_input(label, key=f"{key}-input")
-        submitted = st.form_submit_button("Check", type="primary")
+        submitted = st.form_submit_button(T("Check"), type="primary")
     return (text, False, None) if submitted and text.strip() else None
+
+
+MAX_RECORDINGS = 40  # kept per visit, newest first out; each is ~50-150 KB
+
+
+def keep_recording(key, audio, mime):
+    """Keep a spoken answer so the learner can listen to themselves next to the model voice."""
+    recordings = st.session_state.setdefault("recordings", {})
+    recordings.pop(key, None)
+    recordings[key] = (audio, mime)
+    while len(recordings) > MAX_RECORDINGS:
+        recordings.pop(next(iter(recordings)))
+
+
+def noise_reading():
+    """Dev only (on your own computer): what the noise check measured for the last recording,
+    to calibrate it against real rooms. Thresholds: coach/speech.py."""
+    reading = st.session_state.get("noise-reading")
+    if not dev_mode() or not reading or reading[0] is None:
+        return
+    background, margin, level = reading
+    st.caption(f"🔧 dev · noise check: background {background:.0f} dBFS (noisy above {speech.NOISE_FLOOR_DB}) · "
+               f"voice {margin:+.1f} dB above it (noisy under {speech.NOISY_MARGIN_DB}) → **{level}**")
+
+
+def my_recording(key):
+    """▶ the learner's own recording for this answer, if they spoke it."""
+    kept = st.session_state.get("recordings", {}).get(key)
+    if kept:
+        st.caption(T("🎙️ Your recording:"))
+        st.audio(kept[0], format=kept[1])
+
+
+def note_surroundings(audio, popup="dialog"):
+    """Remember how noisy the learner's last recording was (see noise_banner).
+
+    When it becomes noisy (or noisier), the next run also pops up a message, since the learner is
+    usually scrolled down to their answer: a dialog, or a small toast during time attack."""
+    try:
+        background, margin, level = speech.noise_measure(audio)
+    except Exception:
+        return
+    st.session_state["noise-reading"] = (background, margin, level)
+    previous = st.session_state.get("surroundings")
+    if level != previous:
+        st.session_state.pop("noise-dismissed", None)  # a new level: show the banner again
+        if level in NOISE_MESSAGES and NOISE_RANK[level] > NOISE_RANK.get(previous, 0):
+            st.session_state["noise-popup"] = popup
+    st.session_state["surroundings"] = level
+
+
+NOISE_MESSAGES = {
+    "noisy": "🔊 **Noisy surroundings detected.** The AI may mishear some words. A quieter spot, or holding "
+             "the microphone closer, will help.",
+    "very noisy": "🔊 **Very noisy surroundings.** The background is almost as loud as your voice, so the AI "
+                  "will probably mishear you. Try a quieter spot, hold the microphone closer, or switch to "
+                  "⌨️ Type in the sidebar.",
+}
+
+
+NOISE_RANK = {"quiet": 0, "noisy": 1, "very noisy": 2}
+
+
+def use_typing():
+    st.session_state["answer_mode"] = TYPE
+
+
+def noise_popup(level):
+    """A popup the moment noise is detected, wherever the learner has scrolled to."""
+    @st.dialog(T("🔊 Noisy surroundings"))
+    def popup():
+        st.markdown(T(NOISE_MESSAGES[level]))
+        typing, speaking = st.columns(2)
+        if typing.button(T("⌨️ Switch to typing"), type="primary", width="stretch", on_click=use_typing):
+            st.rerun()
+        if speaking.button(T("Keep speaking"), width="stretch"):
+            st.rerun()
+
+    popup()
+
+
+def noise_banner():
+    """A warning at the top of the page while the learner's recordings are noisy.
+
+    The slot is always there (empty when it's quiet): adding an element above the lesson tabs
+    would make Streamlit rebuild them and jump back to the first tab."""
+    slot = st.container(key="noise-slot")
+    level = st.session_state.get("surroundings")
+    popup = st.session_state.pop("noise-popup", None)
+    if level in NOISE_MESSAGES and popup == "dialog":
+        noise_popup(level)
+    elif level in NOISE_MESSAGES and popup == "toast":
+        st.toast(T("Noisy surroundings: the AI may mishear you."), icon="🔊")
+    if level not in NOISE_MESSAGES or st.session_state.get("noise-dismissed"):
+        return
+    with slot.container(key="noise-banner"):
+        text, close = st.columns([12, 1], vertical_alignment="center")
+        text.warning(T(NOISE_MESSAGES[level]))
+        if close.button("✕", key="noise-dismiss", help=T("Hide until the noise changes")):
+            st.session_state["noise-dismissed"] = True
+            st.rerun()
 
 
 def scenario_hint(scenario):
     """All of a scenario's phrases: what the learner is likely to say."""
     return " ".join(chunk["ko"] for chunk in scenario["chunks"])
+
+
+FOUND_NOTE = "Found your phrase among background sounds."
 
 
 def grade(answer, accepted, keywords=(), hinted=None):
@@ -347,16 +473,17 @@ def grade(answer, accepted, keywords=(), hinted=None):
     if hinted is not None:
         result, match, _, heard, how = check_spoken(answer, accepted, keywords, hinted)
         if how:
-            return result, match, "Found your phrase among background sounds.", heard
+            return result, match, T(FOUND_NOTE), heard
     else:
         result, match, _ = check(answer, accepted, keywords)
     if result != "wrong" or not st.session_state.get("ai_check"):
         return result, match, "", answer
-    ai_model()
+    with st.spinner(T("Loading the AI model (first time only)…")):
+        ai_model()
     same, ai_match, score, reason = semantic.meaning_check(answer, accepted, keywords)
     if same:
-        return "meaning", ai_match, f"AI meaning similarity {score:.2f}", answer
-    return "wrong", match, f"AI meaning similarity {score:.2f}: {reason}", answer
+        return "meaning", ai_match, T("AI meaning similarity {score}", score=f"{score:.2f}"), answer
+    return "wrong", match, T("AI meaning similarity {score}: {reason}", score=f"{score:.2f}", reason=T(reason)), answer
 
 
 def other_answers(accepted, match):
@@ -372,21 +499,24 @@ def heard_by(spoken):
 
 def show_feedback(answer, result, match, ai_note="", echo=True, recall=False, spoken=False, accepted=()):
     if result == "exact":
-        st.success(f"정확해요! Exactly right: **{match}**")
+        st.success(T("정확해요! Exactly right: **{match}**", match=match))
     elif result == "close":
-        st.warning(f"Almost! Check the spelling: **{match}**")
+        st.warning(T("Almost! Check the spelling: **{match}**", match=match))
     elif result == "meaning" and recall:
-        st.info(f"Right meaning! The phrase we're practicing is: **{match}**")
+        st.info(T("Right meaning! The phrase we're practicing is: **{match}**", match=match))
     elif result == "meaning":
-        st.success(f"자연스러워요! Different words, same meaning. Model answer: **{match}**")
+        st.success(T("자연스러워요! Different words, same meaning. Model answer: **{match}**", match=match))
     else:
-        st.error(f"Not quite. A natural answer: **{match}**")
+        st.error(T("Not quite. A natural answer: **{match}**", match=match))
     if others := other_answers(accepted, match):
-        st.caption("✅ Also correct: " + " · ".join(others))
+        st.caption(T("✅ Also correct: ") + " · ".join(others))
     if echo:
-        st.caption(f"🎙️ {heard_by(spoken)} heard: {answer}" if spoken else f"You wrote: {answer}")
+        st.caption(T("🎙️ {model} heard: {answer}", model=heard_by(spoken), answer=answer) if spoken
+                   else T("You wrote: {answer}", answer=answer))
     if ai_note:
-        st.caption(f"🎧 {ai_note}" if ai_note.startswith("Found") else f"🤖 {ai_note}")
+        st.caption(f"🎧 {ai_note}" if ai_note == T(FOUND_NOTE) else f"🤖 {ai_note}")
+    if spoken and result == "wrong" and st.session_state.get("surroundings") in NOISE_MESSAGES:
+        st.caption(T("🔊 It was noisy where you recorded, so the AI may have misheard you."))
 
 
 # ---------- Recall ----------
@@ -398,17 +528,17 @@ def recall_card(chunk, scenario, key):
     used_hint = st.session_state.get(hint_key, False)
 
     html(
-        f'<span class="pill">{scenario["icon"]} {escape(scenario["title_en"])}</span>'
-        f'<span class="pill accent">{escape(chunk["register"])}</span>'
-        f'<div class="prompt-label">How do you say it in Korean?</div>'
-        f'<div class="prompt-en">{escape(chunk["en"])}</div>'
+        f'<span class="pill">{scenario["icon"]} {escape(L(scenario, "title_en"))}</span>'
+        f'<span class="pill accent">{escape(L(chunk, "register"))}</span>'
+        f'<div class="prompt-label">{T("How do you say it in Korean?")}</div>'
+        f'<div class="prompt-en">{escape(L(chunk, "en"))}</div>'
     )
     if used_hint:
-        st.info(f"Hint: *{chunk['romanization']}*")
+        st.info(T("Hint: *{romanization}*", romanization=chunk['romanization']))
 
     if result_key not in st.session_state:
-        submitted = answer_input(key, "Your answer", hint=scenario_hint(scenario))
-        if st.button("Show hint", key=f"{key}-hint-button", disabled=used_hint):
+        submitted = answer_input(key, T("Your answer"), hint=scenario_hint(scenario))
+        if st.button(T("Show hint"), key=f"{key}-hint-button", disabled=used_hint):
             st.session_state[hint_key] = True
             st.rerun()
         if submitted:
@@ -425,17 +555,20 @@ def recall_card(chunk, scenario, key):
     answer, result, match, ai_note, correct, spoken = st.session_state[result_key]
     show_feedback(answer, result, match, ai_note, recall=True, spoken=spoken,
                   accepted=[chunk["ko"], *chunk.get("alternatives", [])])
-    st.caption("🔊 Listen and repeat:")
+    if spoken:
+        my_recording(key)
+        noise_reading()
+    st.caption(T("🔊 Listen and repeat:"))
     play(chunk["id"])
     if result == "meaning":
-        st.caption("It will come back tomorrow so you can practice this exact phrase.")
+        st.caption(T("It will come back tomorrow so you can practice this exact phrase."))
     elif result != "wrong" and not correct:
-        st.caption("You used the hint, so this phrase will come back tomorrow.")
+        st.caption(T("You used the hint, so this phrase will come back tomorrow."))
     if result == "wrong":
         html(
             f'<div class="ko">{escape(chunk["ko"])}</div>'
             f'<div><i>{escape(chunk["romanization"])}</i></div>'
-            f'<div class="mistake">⚠️ {escape(chunk["common_mistake"])}</div>'
+            f'<div class="mistake">⚠️ {escape(L(chunk, "common_mistake"))}</div>'
         )
     return True
 
@@ -449,7 +582,7 @@ def recall_session(chunk_ids, state_key, done_message):
 
     if index >= len(chunk_ids):
         st.success(done_message)
-        if st.button("Practice again", key=f"{state_key}-again"):
+        if st.button(T("Practice again"), key=f"{state_key}-again"):
             st.session_state[f"{state_key}-index"] = 0
             st.session_state[f"{state_key}-round"] = round_ + 1
             st.rerun()
@@ -458,7 +591,7 @@ def recall_session(chunk_ids, state_key, done_message):
     st.progress(index / len(chunk_ids), text=f"{index + 1} / {len(chunk_ids)}")
     chunk, scenario = CHUNK_BY_ID[chunk_ids[index]]
     if recall_card(chunk, scenario, key=f"{state_key}-{round_}-{index}"):
-        if st.button("Next →", type="primary", key=f"{state_key}-next"):
+        if st.button(T("Next →"), type="primary", key=f"{state_key}-next"):
             st.session_state[f"{state_key}-index"] = index + 1
             st.rerun()
 
@@ -483,11 +616,11 @@ def scenario_card(scenario, locked):
         html(
             f'<div class="card-icon">{scenario["icon"]}</div>'
             f'<p class="card-title">{escape(scenario["title_ko"])}</p>'
-            f'<p class="card-sub">{escape(scenario["title_en"])}</p>'
-            f'<span class="pill">{len(scenario["chunks"])} phrases</span>'
-            f'<span class="pill">{len(scenario["roleplay"])}-turn role-play</span>'
+            f'<p class="card-sub">{escape(L(scenario, "title_en"))}</p>'
+            f'<span class="pill">{T("{n} phrases", n=len(scenario["chunks"]))}</span>'
+            f'<span class="pill">{T("{n}-turn role-play", n=len(scenario["roleplay"]))}</span>'
         )
-        if st.button("Start anyway →" if locked else "Start lesson →", key=f"start-{scenario['id']}",
+        if st.button(T("Start anyway →") if locked else T("Start lesson →"), key=f"start-{scenario['id']}",
                      type="secondary" if locked else "primary", width="stretch"):
             go("Lesson", scenario["id"])
 
@@ -497,18 +630,18 @@ def checkpoint_card(number, level):
     best, _, passed = learning_tests.checkpoint_status(load_tests(), checkpoint)
     items = checkpoint.get("test_per_scenario", 2) * len(level["scenarios"])
     with st.container(border=True, key=f"card-checkpoint-{number}"):
-        status = ("✅ Passed" if passed else f"Best so far: {best:.0%}" if best is not None
-                  else "Open anytime: also works as a placement test")
+        status = (T("✅ Passed") if passed else T("Best so far: {best}", best=f"{best:.0%}") if best is not None
+                  else T("Open anytime: also works as a placement test"))
         html(
             f'<div class="card-icon">{checkpoint.get("icon", "🏁")}</div>'
-            f'<p class="card-title">Checkpoint {number}</p>'
+            f'<p class="card-title">{T("Checkpoint {n}", n=number)}</p>'
             f'<p class="card-sub">{escape(checkpoint["title_ko"])}</p>'
-            f'<span class="pill">{items}-phrase mixed test</span>'
-            f'<span class="pill">{len(checkpoint["roleplay"])}-turn story</span>'
-            f'<span class="pill accent">pass: {checkpoint.get("pass", 0.8):.0%}</span>'
+            f'<span class="pill">{T("{n}-phrase mixed test", n=items)}</span>'
+            f'<span class="pill">{T("{n}-turn story", n=len(checkpoint["roleplay"]))}</span>'
+            f'<span class="pill accent">{T("pass: {pct}", pct=f"{checkpoint.get("pass", 0.8):.0%}")}</span>'
             f'<p class="card-sub" style="margin-top:0.4rem">{status}</p>'
         )
-        if st.button("Take the checkpoint →", key=f"checkpoint-{number}", type="primary", width="stretch"):
+        if st.button(T("Take the checkpoint →"), key=f"checkpoint-{number}", type="primary", width="stretch"):
             st.session_state.checkpoint = checkpoint["id"]
             st.switch_page(PAGES["Checkpoint"])
 
@@ -518,8 +651,8 @@ def planned_card(item):
         html(
             f'<div class="card-icon" style="opacity:.55">{item["icon"]}</div>'
             f'<p class="card-title" style="opacity:.6">{escape(item["title_ko"])}</p>'
-            f'<p class="card-sub">{escape(item["title_en"])}</p>'
-            '<span class="pill">🚧 coming soon</span>'
+            f'<p class="card-sub">{escape(L(item, "title_en"))}</p>'
+            f'<span class="pill">{T("🚧 coming soon")}</span>'
         )
 
 
@@ -527,15 +660,15 @@ def level_section(number, level):
     done, passed, unlocked = level_state(number)
     total = len(level["scenarios"]) + len(level.get("planned", []))
     html(
-        f'<div class="level-head"><span class="level-badge">Level {number}</span>'
-        f'<div><b>{escape(level["title_en"])}</b> · {escape(level["title_ko"])}'
-        f'<span class="pill">{escape(level["level"])} · TOPIK {escape(level["topik"])} level</span>'
-        + ('<span class="pill accent">✅ complete</span>' if passed else "")
-        + f'<div class="level-sub">{escape(level["description"])} '
-        f'{done} / {total} lessons finished (post-test taken).</div></div></div>'
+        f'<div class="level-head"><span class="level-badge">{T("Level {n}", n=number)}</span>'
+        f'<div><b>{escape(L(level, "title_en"))}</b> · {escape(level["title_ko"])}'
+        f'<span class="pill">{escape(T("{level} · TOPIK {topik} level", level=L(level, "level"), topik=level["topik"]))}</span>'
+        + (f'<span class="pill accent">{T("✅ complete")}</span>' if passed else "")
+        + f'<div class="level-sub">{escape(L(level, "description"))} '
+        f'{T("{done} / {total} lessons finished (post-test taken).", done=done, total=total)}</div></div></div>'
     )
     if not unlocked:
-        st.caption(f"🔒 Recommended after Checkpoint {number - 1}. You can still open any lesson.")
+        st.caption(T("🔒 Recommended after Checkpoint {n}. You can still open any lesson.", n=number - 1))
     cards = [("scenario", SCENARIO_BY_ID[sid]) for sid in level["scenarios"]]
     cards += [("planned", item) for item in level.get("planned", [])]
     if level.get("checkpoint"):
@@ -555,24 +688,23 @@ def home_page():
     phrase_count = sum(len(scenario["chunks"]) for scenario in SCENARIOS)
     html(
         '<div class="hero">'
-        '<div class="hero-kicker">부산에서 바로 쓰는 한국어 · REAL KOREAN FOR BUSAN</div>'
+        f'<div class="hero-kicker">부산에서 바로 쓰는 한국어 · {T("REAL KOREAN FOR BUSAN")}</div>'
         "<h1>Scenario Vocab <span class=\"accent-word\">Coach</span></h1>"
-        "<p>Learn the Korean you actually need in Busan: whole phrases inside real "
-        "situations, practiced until you can say them without help.</p>"
+        f"<p>{T('Learn the Korean you actually need in Busan: whole phrases inside real situations, practiced until you can say them without help.')}</p>"
         '<div class="hero-stats">'
-        f"<span>🎬 {len(SCENARIOS)} scenarios in {len(LEVELS)} levels</span>"
-        f"<span>💬 {phrase_count} phrases</span>"
-        "<span>🔊 Natural Korean voices</span>"
-        "<span>🎙️ Speak or type</span>"
+        f"<span>{T('🎬 {n} scenarios in {levels} levels', n=len(SCENARIOS), levels=len(LEVELS))}</span>"
+        f"<span>{T('💬 {n} phrases', n=phrase_count)}</span>"
+        f"<span>{T('🔊 Natural Korean voices')}</span>"
+        f"<span>{T('🎙️ Speak or type')}</span>"
         "</div></div>"
     )
 
-    st.subheader("How a lesson works")
+    st.subheader(T("How a lesson works"))
     steps = [
-        ("Situation", "Listen to a real dialogue."),
-        ("Notice", "Study the key phrases and common mistakes."),
-        ("Recall", "Type or say each phrase from memory."),
-        ("Role-play", "Use the phrases in a new conversation."),
+        (T("Situation"), T("Listen to a real dialogue.")),
+        (T("Notice"), T("Study the key phrases and common mistakes.")),
+        (T("Recall"), T("Type or say each phrase from memory.")),
+        (T("Role-play"), T("Use the phrases in a new conversation.")),
     ]
     html(
         '<div class="steps">'
@@ -587,22 +719,22 @@ def home_page():
     for number, level in enumerate(LEVELS, 1):
         level_section(number, level)
 
-    with st.expander("⌨️ How to type Korean"):
-        st.markdown(
+    with st.expander(T("⌨️ How to type Korean")):
+        st.markdown(T(
             "- **Mac:** System Settings → Keyboard → Text Input → Edit → **+** → Korean → 2-Set Korean\n"
             "- **Windows:** Settings → Time & Language → Language → Add a language → Korean\n"
             "- **Phone:** add the Korean keyboard in your keyboard settings\n\n"
             "Romanization is only a hint. Typing real Hangul is part of the practice."
-        )
+        ))
 
-    with st.expander("🔬 Why this works"):
-        st.markdown(
+    with st.expander(T("🔬 Why this works")):
+        st.markdown(T(
             "- **Retrieval practice:** recalling a phrase builds memory far better than rereading it.\n"
             "- **Spaced repetition:** each phrase comes back after 1, 2, 4, 7, then 15 days.\n"
             "- **Chunks, not single words:** fluent speakers store whole phrases.\n"
             "- **Task-based learning:** role-plays use the phrases for a real goal.\n"
             "- **Interleaving:** daily review mixes phrases from different scenarios."
-        )
+        ))
 
 
 # ---------- Moving between lessons ----------
@@ -620,8 +752,8 @@ def step_label(step):
     kind, target = step
     if kind == "lesson":
         scenario = SCENARIO_BY_ID[target]
-        return f"{scenario['icon']} {scenario['title_en']}"
-    return f"🏁 Checkpoint {CHECKPOINT_BY_ID[target][0]}"
+        return f"{scenario['icon']} {L(scenario, 'title_en')}"
+    return T("🏁 Checkpoint {n}", n=CHECKPOINT_BY_ID[target][0])
 
 
 def goto(step):
@@ -660,6 +792,22 @@ def scroll_to_top():
         )
 
 
+def glide_to_end(once_key):
+    """Smoothly bring the end of the page (e.g. a time-attack summary) into view, once."""
+    seen = st.session_state.setdefault("_glided", set())
+    if once_key in seen:
+        return
+    seen.add(once_key)
+    st.iframe(
+        f"<!-- {once_key} --><script>setTimeout(() => {{"
+        "const main = window.parent.document.querySelector('[data-testid=stMain]');"
+        "const calm = window.parent.matchMedia('(prefers-reduced-motion: reduce)').matches;"
+        "if (main) main.scrollTo({top: main.scrollHeight, behavior: calm ? 'auto' : 'smooth'});"
+        "}, 250);</script>",
+        height=1,
+    )
+
+
 def course_nav(step, key):
     """← All lessons · ‹ previous · next › bar, with where you are in the course."""
     index = COURSE.index(step)
@@ -668,19 +816,19 @@ def course_nav(step, key):
     if step[0] == "lesson":
         number = LEVEL_NUMBER[step[1]]
         lessons = LEVELS[number - 1]["scenarios"]
-        where = f"Level {number} · Lesson {lessons.index(step[1]) + 1} of {len(lessons)}"
+        where = T("Level {n} · Lesson {i} of {total}", n=number, i=lessons.index(step[1]) + 1, total=len(lessons))
     else:
-        where = f"Level {CHECKPOINT_BY_ID[step[1]][0]} · Checkpoint"
+        where = T("Level {n} · Checkpoint", n=CHECKPOINT_BY_ID[step[1]][0])
     with st.container(key=f"course-nav-{key}"):
         left, middle, right = st.columns([1, 1.4, 1.4], vertical_alignment="center")
-        left.button("← All lessons", key=f"{key}-home", on_click=goto, args=(("home", None),),
+        left.button(T("← All lessons"), key=f"{key}-home", on_click=goto, args=(("home", None),),
                     icon=":material/grid_view:")
         if previous:
             middle.button(f"‹ {step_label(previous)}", key=f"{key}-prev", on_click=goto, args=(previous,),
-                          width="stretch", help="Previous in the course")
+                          width="stretch", help=T("Previous in the course"))
         if following:
             right.button(f"{step_label(following)} ›", key=f"{key}-next", on_click=goto, args=(following,),
-                         width="stretch", type="primary", help="Next in the course")
+                         width="stretch", type="primary", help=T("Next in the course"))
         html(f'<div class="course-where">{where}</div>')
 
 
@@ -688,13 +836,13 @@ def next_up(step, key):
     """A big 'what's next' button at the end of a lesson."""
     index = COURSE.index(step)
     if index + 1 >= len(COURSE):
-        st.success("🎉 That's the last lesson for now. More are coming soon!")
+        st.success(T("🎉 That's the last lesson for now. More are coming soon!"))
         return
     following = COURSE[index + 1]
     with st.container(border=True, key=f"next-up-{key}"):
-        html('<div class="prompt-label">Finished this lesson?</div>'
-             f'<div class="next-title">Next: {escape(step_label(following))}</div>')
-        st.button("Continue →", key=f"{key}-continue", on_click=goto, args=(following,), type="primary")
+        html(f'<div class="prompt-label">{T("Finished this lesson?")}</div>'
+             f'<div class="next-title">{escape(T("Next: {label}", label=step_label(following)))}</div>')
+        st.button(T("Continue →"), key=f"{key}-continue", on_click=goto, args=(following,), type="primary")
 
 
 def choose_level():
@@ -705,47 +853,48 @@ def choose_level():
 
 
 def lesson_page():
+    preload_models()
     follow_goto("Lesson")
     scroll_to_top()
     st.session_state.setdefault("scenario", SCENARIOS[0]["id"])
     course_nav(("lesson", st.session_state.scenario), "lesson-top")
     # Pick a level first, then one of that level's lessons (folded away: Previous / Next cover most moves)
     st.session_state["lesson-level"] = LEVEL_NUMBER[st.session_state.scenario]
-    jump = st.expander("🔀 Jump to another lesson")
+    jump = st.expander(T("🔀 Jump to another lesson"))
     pick_level, pick_lesson = jump.columns([1, 2], vertical_alignment="bottom")
     pick_level.segmented_control(
-        "Level",
+        T("Level"),
         list(range(1, len(LEVELS) + 1)),
-        format_func=lambda n: f"Level {n}",
+        format_func=lambda n: T("Level {n}", n=n),
         key="lesson-level",
         on_change=choose_level,
     )
     level_lessons = LEVELS[st.session_state["lesson-level"] - 1]["scenarios"]
     scenario_id = pick_lesson.selectbox(
-        "Lesson",
+        T("Lesson"),
         level_lessons,
         format_func=lambda sid: f"{level_lessons.index(sid) + 1}. {SCENARIO_BY_ID[sid]['icon']} "
-                                f"{SCENARIO_BY_ID[sid]['title_en']} · {SCENARIO_BY_ID[sid]['title_ko']}",
+                                f"{L(SCENARIO_BY_ID[sid], 'title_en')} · {SCENARIO_BY_ID[sid]['title_ko']}",
         key="scenario",
     )
     scenario = SCENARIO_BY_ID[scenario_id]
 
     html(
         f'<div class="lesson-head"><div class="lesson-icon">{scenario["icon"]}</div><div>'
-        f'<span class="pill">{escape(scenario["level"])}</span>'
-        f'<span class="pill">{escape(scenario["title_en"])}</span>'
+        f'<span class="pill">{escape(L(scenario, "level"))}</span>'
+        f'<span class="pill">{escape(L(scenario, "title_en"))}</span>'
         f'<h1>{escape(scenario["title_ko"])}</h1>'
-        f'<p>{escape(scenario["situation_en"])}</p></div></div>'
+        f'<p>{escape(L(scenario, "situation_en"))}</p></div></div>'
     )
 
     situation_tab, notice_tab, recall_tab, roleplay_tab, test_tab = st.tabs(
-        ["1 · Situation", "2 · Notice", "3 · Recall", "4 · Role-play", "📝 Test"]
+        [T("1 · Situation"), T("2 · Notice"), T("3 · Recall"), T("4 · Role-play"), T("📝 Test")]
     )
 
     with situation_tab:
         toggles = st.columns(2)
-        show_romanization = toggles[0].toggle("Show romanization", value=True)
-        show_english = toggles[1].toggle("Show English", value=True)
+        show_romanization = toggles[0].toggle(T("Show romanization"), value=True)
+        show_english = toggles[1].toggle(T("Show English"), value=True)
         if not conversation_player(scenario, show_romanization, show_english):
             for number, line in enumerate(scenario["dialogue"], 1):
                 role = "user" if line["speaker"] == "나" else "assistant"
@@ -757,7 +906,7 @@ def lesson_page():
                     if show_romanization:
                         st.caption(line["romanization"])
                     if show_english:
-                        st.caption(f"*{line['en']}*")
+                        st.caption(f"*{L(line, 'en')}*")
                     play(f"{scenario_id}_d{number}")
 
     with notice_tab:
@@ -766,21 +915,21 @@ def lesson_page():
                 html(
                     f'<div class="ko">{escape(chunk["ko"])}</div>'
                     f'<i>{escape(chunk["romanization"])}</i> '
-                    f'<span class="pill accent">{escape(chunk["register"])}</span>'
-                    f'<div><b>{escape(chunk["en"])}</b></div>'
+                    f'<span class="pill accent">{escape(L(chunk, "register"))}</span>'
+                    f'<div><b>{escape(L(chunk, "en"))}</b></div>'
                 )
                 play(chunk["id"])
                 html(
-                    f'<p class="note">💡 {escape(chunk["note"])}</p>'
-                    f'<div class="mistake">⚠️ {escape(chunk["common_mistake"])}</div>'
+                    f'<p class="note">💡 {escape(L(chunk, "note"))}</p>'
+                    f'<div class="mistake">⚠️ {escape(L(chunk, "common_mistake"))}</div>'
                 )
 
     with recall_tab:
-        st.write("Type or say each phrase in Korean. Every answer goes into your review schedule.")
+        st.write(T("Type or say each phrase in Korean. Every answer goes into your review schedule."))
         recall_session(
             [chunk["id"] for chunk in scenario["chunks"]],
             state_key=f"lesson-{scenario_id}",
-            done_message="All phrases are in your review queue. Try the role-play next!",
+            done_message=T("All phrases are in your review queue. Try the role-play next!"),
         )
 
     with roleplay_tab:
@@ -812,10 +961,10 @@ def pace_note(latency):
     if latency is None:
         return ""
     if latency <= 2.0:
-        return f"⚡ Started answering after {latency:.1f} s: natural conversation pace"
+        return T("⚡ Started answering after {seconds} s: natural conversation pace", seconds=f"{latency:.1f}")
     if latency <= 3.5:
-        return f"🕐 Started answering after {latency:.1f} s: a little slow, keep practicing"
-    return f"🐢 Started answering after {latency:.1f} s: try to answer sooner"
+        return T("🕐 Started answering after {seconds} s: a little slow, keep practicing", seconds=f"{latency:.1f}")
+    return T("🐢 Started answering after {seconds} s: try to answer sooner", seconds=f"{latency:.1f}")
 
 
 def roleplay(scenario):
@@ -827,41 +976,46 @@ def roleplay(scenario):
     """
     turns = scenario["roleplay"]
     mode = st.segmented_control(
-        "Mode", [PRACTICE, TIME_ATTACK], default=PRACTICE, key=f"roleplay-{scenario['id']}-mode",
-        help="Time attack: the recorder starts by itself after their line, and you have a few "
-        "seconds to answer, like a real conversation.",
+        T("Mode"), [PRACTICE, TIME_ATTACK], default=PRACTICE, key=f"roleplay-{scenario['id']}-mode",
+        format_func=T,
+        help=T("Time attack: the recorder starts by itself after their line, and you have a few "
+               "seconds to answer, like a real conversation."),
     ) or PRACTICE
     timed = mode == TIME_ATTACK
     answers_key = f"{'timeattack' if timed else 'roleplay'}-{scenario['id']}"
     answers = st.session_state.setdefault(answers_key, [])
     round_ = st.session_state.setdefault(f"{answers_key}-round", 0)
     if timed:
-        st.write("Their line plays, then **you have a few seconds to answer**, no pausing. "
-                 "Recording starts and stops by itself. Read the task first!")
+        st.write(T("Their line plays, then **you have a few seconds to answer**, no pausing. "
+                   "Recording starts and stops by itself. Read the task first!"))
     else:
-        st.write("A new conversation. Listen to what they say, then reply in Korean to complete the task.")
+        st.write(T("A new conversation. Listen to what they say, then reply in Korean to complete the task."))
     listening = st.toggle(
-        "🎧 Listening practice: hide their words until you ask", key=f"{answers_key}-listening"
+        T("🎧 Listening practice: hide their words until you ask"), key=f"{answers_key}-listening"
     )
     # All lesson tabs load together, so wait for the learner before any voice plays.
     started_key = f"{answers_key}-started"
     if not timed and not st.session_state.get(started_key):
-        if st.button("▶ Start the conversation", type="primary", key=f"{answers_key}-start"):
+        if st.button(T("▶ Start the conversation"), type="primary", key=f"{answers_key}-start"):
             st.session_state[started_key] = True
             st.rerun()
         return
 
-    for turn, (answer, result, match, ai_note, spoken, *extra) in zip(turns, answers):
+    for number, (turn, (answer, result, match, ai_note, spoken, *extra)) in enumerate(zip(turns, answers)):
         with st.chat_message("assistant", avatar="🧑"):
             html(
                 f'<span class="speaker">{escape(turn["speaker"])}</span>'
                 f'<span class="ko-line">{escape(turn["prompt_ko"])}</span>'
             )
         with st.chat_message("user", avatar="🙋"):
-            st.write(f"🎙️ {answer}" if spoken and answer else (answer or "⏰ No answer in time"))
+            st.write(f"🎙️ {answer}" if spoken and answer else (answer or T("⏰ No answer in time")))
             show_feedback(answer, result, match, ai_note, echo=False, accepted=turn["accepted"])
             if extra and extra[0] is not None:
                 st.caption(pace_note(extra[0]))
+            if spoken:
+                my_recording(f"{answers_key}-{round_}-{number}")
+                if number == len(answers) - 1:
+                    noise_reading()
 
     if len(answers) < len(turns):
         turn = turns[len(answers)]
@@ -872,21 +1026,21 @@ def roleplay(scenario):
         has_audio = (AUDIO_DIR / f"{turn['id']}.mp3").exists()
         with st.chat_message("assistant", avatar="🧑"):
             if listening and has_audio:
-                html(f'<span class="speaker">{escape(turn["speaker"])}</span> 🔊 Listen…')
-                with st.expander("Show their words"):
+                html(f'<span class="speaker">{escape(turn["speaker"])}</span> {T("🔊 Listen…")}')
+                with st.expander(T("Show their words")):
                     st.write(turn["prompt_ko"])
-                    st.caption(turn["prompt_en"])
+                    st.caption(L(turn, "prompt_en"))
             else:
                 html(
                     f'<span class="speaker">{escape(turn["speaker"])}</span>'
                     f'<span class="ko-line">{escape(turn["prompt_ko"])}</span>'
                 )
-                with st.expander("English"):
-                    st.write(turn["prompt_en"])
+                with st.expander(T("English")):
+                    st.write(L(turn, "prompt_en"))
             play(turn["id"], autoplay=True)
-        html(f'<div class="task">🎯 <b>Your task:</b> {escape(turn["task_en"])}</div>')
+        html(f'<div class="task">{T("🎯 <b>Your task:</b> {task}", task=escape(L(turn, "task_en")))}</div>')
         submitted = answer_input(
-            f"{answers_key}-{round_}-{len(answers)}", "Your reply", hint=scenario_hint(scenario)
+            f"{answers_key}-{round_}-{len(answers)}", T("Your reply"), hint=scenario_hint(scenario)
         )
         if submitted:
             answer, spoken, hinted = submitted
@@ -898,13 +1052,15 @@ def roleplay(scenario):
         return
 
     passed = sum(result != "wrong" for _, result, *_ in answers)
-    summary = f"Conversation complete: {passed} / {len(turns)} replies understood."
+    summary = T("Conversation complete: {passed} / {total} replies understood.", passed=passed, total=len(turns))
     if timed:
         latencies = [a[5] for a in answers if len(a) > 5 and a[5] is not None]
         if latencies:
-            summary += f" Average start: {sum(latencies) / len(latencies):.1f} s."
+            summary += T(" Average start: {seconds} s.", seconds=f"{sum(latencies) / len(latencies):.1f}")
     st.success(summary)
-    if st.button("Try again", key=f"{answers_key}-again"):
+    if timed:
+        glide_to_end(f"{answers_key}-{round_}")
+    if st.button(T("Try again"), key=f"{answers_key}-again"):
         st.session_state[answers_key] = []
         st.session_state[f"{answers_key}-round"] = round_ + 1
         st.rerun()
@@ -915,7 +1071,7 @@ def time_attack_turn(scenario, turn, answers, turn_id, listening, autostart):
     limit = time_limit(turn["accepted"])
     with st.chat_message("assistant", avatar="🧑"):
         if listening:
-            html(f'<span class="speaker">{escape(turn["speaker"])}</span> 🔊 Listen…')
+            html(f'<span class="speaker">{escape(turn["speaker"])}</span> {T("🔊 Listen…")}')
         else:
             html(
                 f'<span class="speaker">{escape(turn["speaker"])}</span>'
@@ -930,8 +1086,13 @@ def time_attack_turn(scenario, turn, answers, turn_id, listening, autostart):
             if path.exists() else "",
             "limit": limit,
             "speaker": turn["speaker"],
-            "task": turn["task_en"],
-            "listen_text": "Listen…" if listening else turn["prompt_ko"],
+            "task": L(turn, "task_en"),
+            "listen_text": T("Listen…") if listening else turn["prompt_ko"],
+            "labels": {text: T(text) for text in (
+                "Answer sent. Checking…", "Microphone blocked. Allow it in the browser and try again.",
+                "Your turn: speak now!", "Got it. Checking…", "Time's up!",
+                "Press start. Their line plays, then you have to answer in time.")},
+            "limit_text": T("{seconds} s to answer", seconds=f"{limit:.1f}"),
             "dark": st.context.theme.type == "dark",
             "autostart": autostart,  # the first turn needs a click (browsers require it for sound)
         },
@@ -943,14 +1104,16 @@ def time_attack_turn(scenario, turn, answers, turn_id, listening, autostart):
         return
     done.add(turn_id)
     if not reply.get("spoke"):
-        answers.append(("", "wrong", turn["accepted"][0], "⏰ Time's up: no answer heard", asr_engine(), None))
+        answers.append(("", "wrong", turn["accepted"][0], T("⏰ Time's up: no answer heard"), asr_engine(), None))
         st.rerun()
     audio = base64.b64decode(reply["audio"])
+    keep_recording(turn_id, audio, reply.get("mime") or "audio/webm")
     speech_model()
-    with st.spinner("Listening…"):
+    with st.spinner(T("Listening…")):
         plain = transcribe(audio)
+    note_surroundings(audio, popup="toast")  # time attack: no popup over the next turn's recorder
     if not plain:
-        answers.append(("", "wrong", turn["accepted"][0], "No words recognized", asr_engine(), reply.get("latency")))
+        answers.append(("", "wrong", turn["accepted"][0], T("No words recognized"), asr_engine(), reply.get("latency")))
         st.rerun()
     hint = scenario_hint(scenario)
     result, match, ai_note, answer = grade(
@@ -976,19 +1139,19 @@ def run_test(test_id, hint):
     if not running:
         return False
     items, answers = running["items"], running["answers"]
-    title = TEST_TITLES[running["kind"]]
+    title = T(TEST_TITLES[running["kind"]])
     if len(answers) < len(items):
         chunk = CHUNK_BY_ID[items[len(answers)]][0]
         st.progress(len(answers) / len(items), text=f"{title}: {len(answers) + 1} / {len(items)}")
-        html(f'<div class="prompt-label">How do you say it in Korean?</div>'
-             f'<div class="prompt-en">{escape(chunk["en"])}</div>')
+        html(f'<div class="prompt-label">{T("How do you say it in Korean?")}</div>'
+             f'<div class="prompt-en">{escape(L(chunk, "en"))}</div>')
         key = f"test-{test_id}-{running['round']}-{len(answers)}"
-        submitted = answer_input(key, "Your answer", hint=hint)
+        submitted = answer_input(key, T("Your answer"), hint=hint)
         columns = st.columns(2)
-        if columns[0].button("I don't know yet →", key=f"{key}-skip"):
+        if columns[0].button(T("I don't know yet →"), key=f"{key}-skip"):
             answers.append({"chunk": chunk["id"], "answer": "", "result": "wrong"})
             st.rerun()
-        if columns[1].button("Stop the test", key=f"{key}-stop"):
+        if columns[1].button(T("Stop the test"), key=f"{key}-stop"):
             del st.session_state[f"test-{test_id}"]
             st.rerun()
         if submitted:
@@ -1007,14 +1170,14 @@ def run_test(test_id, hint):
 
 
 def show_test_answers(result, label="Answers from your last test"):
-    with st.expander(f"{label} ({result['date']})"):
+    with st.expander(f"{T(label)} ({result['date']})"):
         for item in result["answers"]:
             chunk = CHUNK_BY_ID.get(item["chunk"], ({}, None))[0]
             mark = "✅" if item["result"] in learning_tests.COUNTS_AS_KNOWN else "❌"
             also = " · ".join(chunk.get("alternatives", []))
-            st.markdown(f"{mark} **{escape(chunk.get('en', ''))}** → {escape(chunk.get('ko', ''))}  \n"
-                        + (f"<small>Also correct: {escape(also)}</small>  \n" if also else "")
-                        + f"<small>You: {escape(item['answer'] or '(no answer)')}</small>",
+            st.markdown(f"{mark} **{escape(L(chunk, 'en') if chunk else '')}** → {escape(chunk.get('ko', ''))}  \n"
+                        + (f"<small>{T('Also correct: {also}', also=escape(also))}</small>  \n" if also else "")
+                        + f"<small>{T('You: {answer}', answer=escape(item['answer'] or T('(no answer)')))}</small>",
                         unsafe_allow_html=True)
 
 
@@ -1026,23 +1189,23 @@ def test_section(scenario):
     entry = tests.get(scenario["id"]) or {}
     pre, post, gain = learning_tests.summary(tests, scenario["id"])
     if done := st.session_state.pop(f"test-done-{scenario['id']}", None):
-        st.success(f"{done[0]} finished: {done[1]} / {done[2]} phrases known.")
-    st.write(
+        st.success(T("{title} finished: {correct} / {total} phrases known.", title=done[0], correct=done[1], total=done[2]))
+    st.write(T(
         "Measure what this lesson teaches you. Take the **pre-test before** you start "
         "(it's fine to know nothing yet!) and the **post-test after** studying. Each test asks "
         "every phrase from its English meaning, with no hints. You see the answers at the end. "
         "Tests don't change your review schedule."
-    )
+    ))
     columns = st.columns(3)
-    columns[0].metric("Pre-test", "–" if pre is None else f"{pre:.0%}")
-    columns[1].metric("Post-test", "–" if post is None else f"{post:.0%}")
-    columns[2].metric("Gain", "–" if gain is None else f"{gain:+.0%}")
+    columns[0].metric(T("Pre-test"), "–" if pre is None else f"{pre:.0%}")
+    columns[1].metric(T("Post-test"), "–" if post is None else f"{post:.0%}")
+    columns[2].metric(T("Gain"), "–" if gain is None else f"{gain:+.0%}")
     kind = "pre" if entry.get("pre") is None else "post"
     if kind == "pre":
-        label = "📝 Start the pre-test"
+        label = T("📝 Start the pre-test")
     else:
-        label = "📝 Take the post-test" + (" again" if entry.get("post") else "")
-        st.caption("Pre-test done. Study the lesson (Situation → Role-play), then take the post-test.")
+        label = T("📝 Take the post-test again") if entry.get("post") else T("📝 Take the post-test")
+        st.caption(T("Pre-test done. Study the lesson (Situation → Role-play), then take the post-test."))
     if st.button(label, type="primary", key=f"test-start-{scenario['id']}"):
         start_test(scenario["id"], kind, learning_tests.test_items(scenario, kind))
     last = (entry.get("post") or [None])[-1] or entry.get("pre")
@@ -1052,6 +1215,7 @@ def test_section(scenario):
 
 def checkpoint_page():
     """A level's checkpoint: a mixed test (pass 80%) and a story role-play across the level."""
+    preload_models()
     follow_goto("Checkpoint")
     scroll_to_top()
     checkpoint_id = st.session_state.get("checkpoint") or next(iter(CHECKPOINT_BY_ID))
@@ -1062,13 +1226,13 @@ def checkpoint_page():
     items = learning_tests.checkpoint_items(checkpoint, scenarios)
     html(
         f'<div class="lesson-head"><div class="lesson-icon">{checkpoint.get("icon", "🏁")}</div><div>'
-        f'<span class="pill">Level {number} · {escape(level["title_en"])}</span>'
-        f'<span class="pill accent">pass: {checkpoint.get("pass", 0.8):.0%}</span>'
+        f'<span class="pill">{escape(T("Level {n} · {title}", n=number, title=L(level, "title_en")))}</span>'
+        f'<span class="pill accent">{T("pass: {pct}", pct=f"{checkpoint.get("pass", 0.8):.0%}")}</span>'
         f'<h1>{escape(checkpoint["title_ko"])}</h1>'
-        f'<p>{escape(checkpoint["title_en"])}. {escape(checkpoint["situation_en"])}</p></div></div>'
+        f'<p>{escape(L(checkpoint, "title_en"))}{T(". ")}{escape(L(checkpoint, "situation_en"))}</p></div></div>'
     )
-    test_tab, story_tab = st.tabs([f"📝 Mixed test ({len(items)} phrases)",
-                                   f"🗣️ Story role-play ({len(checkpoint['roleplay'])} turns)"])
+    test_tab, story_tab = st.tabs([T("📝 Mixed test ({n} phrases)", n=len(items)),
+                                   T("🗣️ Story role-play ({n} turns)", n=len(checkpoint['roleplay']))])
     with test_tab:
         test_pool = {"id": checkpoint_id, "chunks": [CHUNK_BY_ID[i][0] for i in items]}
         if run_test(checkpoint_id, scenario_hint(test_pool)):
@@ -1078,44 +1242,48 @@ def checkpoint_page():
         if done := st.session_state.pop(f"test-done-{checkpoint_id}", None):
             score = done[1] / done[2]
             if score >= checkpoint.get("pass", 0.8):
-                st.success(f"🎉 {done[1]} / {done[2]} ({score:.0%}): Level {number} complete!"
-                           + (f" Level {number + 1} is unlocked." if number < len(LEVELS) else ""))
+                st.success(T("🎉 {correct} / {total} ({pct}): Level {n} complete!", correct=done[1], total=done[2],
+                             pct=f"{score:.0%}", n=number)
+                           + (T(" Level {n} is unlocked.", n=number + 1) if number < len(LEVELS) else ""))
                 st.balloons()
             else:
                 last = tests[checkpoint_id]["checkpoint"][-1]
                 missed = {CHUNK_BY_ID[a["chunk"]][1]["id"] for a in last["answers"]
                           if a["result"] not in learning_tests.COUNTS_AS_KNOWN}
-                names = ", ".join(f"{SCENARIO_BY_ID[s]['icon']} {SCENARIO_BY_ID[s]['title_en']}"
+                names = ", ".join(f"{SCENARIO_BY_ID[s]['icon']} {L(SCENARIO_BY_ID[s], 'title_en')}"
                                   for s in level["scenarios"] if s in missed)
-                st.warning(f"Not yet: {done[1]} / {done[2]} ({score:.0%}). You need "
-                           f"{checkpoint.get('pass', 0.8):.0%}. Review: {names}, then try again.")
-        st.write(
-            f"{len(items)} phrases, {checkpoint.get('test_per_scenario', 2)} from each Level {number} lesson, "
-            "mixed together. No hints and no feedback until the end, just like a lesson test. "
-            f"Score {checkpoint.get('pass', 0.8):.0%} or more to complete the level. "
-            "You can take it anytime, even before the lessons, to see if you can skip ahead."
-        )
+                st.warning(T("Not yet: {correct} / {total} ({pct}). You need {need}. Review: {names}, then try again.",
+                             correct=done[1], total=done[2], pct=f"{score:.0%}",
+                             need=f"{checkpoint.get('pass', 0.8):.0%}", names=names))
+        st.write(T(
+            "{n} phrases, {per} from each Level {level} lesson, mixed together. No hints and no feedback until the "
+            "end, just like a lesson test. Score {pct} or more to complete the level. You can take it anytime, even "
+            "before the lessons, to see if you can skip ahead.",
+            n=len(items), per=checkpoint.get('test_per_scenario', 2), level=number,
+            pct=f"{checkpoint.get('pass', 0.8):.0%}",
+        ))
         columns = st.columns(3)
-        columns[0].metric("Best score", "–" if best is None else f"{best:.0%}")
-        columns[1].metric("Last attempt", "–" if latest is None else f"{latest:.0%}")
-        columns[2].metric("Status", "✅ Passed" if passed else "Not yet")
-        if st.button("📝 Start the checkpoint test", type="primary", key=f"start-{checkpoint_id}"):
+        columns[0].metric(T("Best score"), "–" if best is None else f"{best:.0%}")
+        columns[1].metric(T("Last attempt"), "–" if latest is None else f"{latest:.0%}")
+        columns[2].metric(T("Status"), T("✅ Passed") if passed else T("Not yet"))
+        if st.button(T("📝 Start the checkpoint test"), type="primary", key=f"start-{checkpoint_id}"):
             start_test(checkpoint_id, "checkpoint", items)
         if (tests.get(checkpoint_id) or {}).get("checkpoint"):
             show_test_answers(tests[checkpoint_id]["checkpoint"][-1], "Answers from your last attempt")
     with story_tab:
-        st.write("One turn from each part of the level, in a row, like a real day out. "
-                 "Practice it here; the story isn't scored for passing.")
+        st.write(T("One turn from each part of the level, in a row, like a real day out. Practice it here; the story isn't "
+                   "scored for passing."))
         story = {"id": checkpoint_id, "roleplay": checkpoint["roleplay"],
                  "chunks": [chunk for scenario in scenarios for chunk in scenario["chunks"]]}
         roleplay(story)
 
 
 def review_page():
-    st.title("🔁 Review")
+    preload_models()
+    st.title(T("🔁 Review"))
     if not progress():
-        st.info("Nothing to review yet. Start a lesson first!")
-        if st.button("Go to lessons"):
+        st.info(T("Nothing to review yet. Start a lesson first!"))
+        if st.button(T("Go to lessons")):
             go("Lesson")
         return
 
@@ -1126,16 +1294,16 @@ def review_page():
     queue = st.session_state["review-queue"]
 
     if not queue:
-        st.success("Nothing due today. Come back tomorrow! 🎉")
+        st.success(T("Nothing due today. Come back tomorrow! 🎉"))
     else:
-        st.write(f"{len(queue)} phrases due, mixed from all scenarios.")
+        st.write(T("{n} phrases due, mixed from all scenarios.", n=len(queue)))
         recall_session(
             queue,
             state_key="review",
-            done_message="Review finished for today. 수고했어요!",
+            done_message=T("Review finished for today. 수고했어요!"),
         )
 
-    if st.button("Refresh due phrases"):
+    if st.button(T("Refresh due phrases")):
         st.session_state.pop("review-queue")
         st.session_state["review-index"] = 0
         st.session_state["review-round"] = st.session_state.get("review-round", 0) + 1
@@ -1150,29 +1318,30 @@ def learning_gains():
         pre, post, gain = learning_tests.summary(tests, scenario["id"])
         if pre is not None:
             rows.append({
-                "Scenario": f"{scenario['icon']} {scenario['title_en']}",
-                "Pre-test": f"{pre:.0%}",
-                "Post-test": "–" if post is None else f"{post:.0%}",
-                "Gain": "–" if gain is None else f"{gain:+.0%}",
+                T("Scenario"): f"{scenario['icon']} {L(scenario, 'title_en')}",
+                T("Pre-test"): f"{pre:.0%}",
+                T("Post-test"): "–" if post is None else f"{post:.0%}",
+                T("Gain"): "–" if gain is None else f"{gain:+.0%}",
             })
     for checkpoint_id, (number, level) in CHECKPOINT_BY_ID.items():
         best, latest, passed = learning_tests.checkpoint_status(tests, level["checkpoint"])
         if best is not None:
-            rows.append({"Scenario": f"🏁 Checkpoint {number} (Level {number})", "Pre-test": "",
-                         "Post-test": f"best {best:.0%}", "Gain": "✅ passed" if passed else "not yet"})
-    st.subheader("Learning gains")
+            rows.append({T("Scenario"): T("🏁 Checkpoint {n} (Level {n})", n=number), T("Pre-test"): "",
+                         T("Post-test"): T("best {pct}", pct=f"{best:.0%}"),
+                         T("Gain"): T("✅ passed") if passed else T("not yet")})
+    st.subheader(T("Learning gains"))
     if not rows:
-        st.caption("Take a lesson's 📝 Test before and after studying to see what it taught you.")
+        st.caption(T("Take a lesson's 📝 Test before and after studying to see what it taught you."))
         return
     st.dataframe(pd.DataFrame(rows), hide_index=True)
 
 
 def progress_page():
-    st.title("📈 Progress")
+    st.title(T("📈 Progress"))
     learning_gains()
     items = progress()
     if not items:
-        st.info("No progress yet. Finish a lesson to see your stats.")
+        st.info(T("No progress yet. Finish a lesson to see your stats."))
         return
 
     today = date.today().isoformat()
@@ -1184,39 +1353,39 @@ def progress_page():
     accuracy = sum(correct for _, correct in history) / len(history) if history else 0
 
     metrics = st.columns(4)
-    metrics[0].metric("Phrases learned", len(items))
-    metrics[1].metric("Due today", sum(item["due"] <= today for item in items.values()))
-    metrics[2].metric("Mastered (box 5)", sum(item["box"] == srs.MAX_BOX for item in items.values()))
-    metrics[3].metric("Recall accuracy", f"{accuracy:.0%}")
+    metrics[0].metric(T("Phrases learned"), len(items))
+    metrics[1].metric(T("Due today"), sum(item["due"] <= today for item in items.values()))
+    metrics[2].metric(T("Mastered (box 5)"), sum(item["box"] == srs.MAX_BOX for item in items.values()))
+    metrics[3].metric(T("Recall accuracy"), f"{accuracy:.0%}")
 
-    st.subheader("Recall accuracy over time")
+    st.subheader(T("Recall accuracy over time"))
     daily = pd.DataFrame(
         [{"date": entry["date"], "correct": entry["correct"]}
          for item in items.values() for entry in item["history"]]
     )
     if daily["date"].nunique() < 2:
-        st.caption("Practice on two or more days to see a trend. Each point is one day's share "
-                   "of correct answers in Recall and Review.")
+        st.caption(T("Practice on two or more days to see a trend. Each point is one day's share of correct answers in "
+                     "Recall and Review."))
     else:
         by_day = daily.groupby("date")["correct"].agg(["mean", "count"]).reset_index()
         st.line_chart(
-            by_day.assign(**{"Accuracy (%)": by_day["mean"] * 100}).set_index("date")[["Accuracy (%)"]],
-            y_label="% correct",
+            by_day.assign(**{T("Accuracy (%)"): by_day["mean"] * 100}).set_index("date")[[T("Accuracy (%)")]],
+            y_label=T("% correct"),
         )
-        st.caption(f"{len(by_day)} days, {int(by_day['count'].sum())} answers. Spaced repetition "
-                   "brings back harder phrases more often, so a flat line can still mean progress.")
+        st.caption(T("{days} days, {answers} answers. Spaced repetition brings back harder phrases more often, so a flat line "
+                     "can still mean progress.", days=len(by_day), answers=int(by_day['count'].sum())))
 
-    st.subheader("Phrases per box")
-    st.caption("Box 1 comes back tomorrow; box 5 waits 15 days.")
+    st.subheader(T("Phrases per box"))
+    st.caption(T("Box 1 comes back tomorrow; box 5 waits 15 days."))
     boxes = pd.Series([item["box"] for item in items.values()]).value_counts()
     st.bar_chart(
         pd.DataFrame(
-            {"Phrases": [int(boxes.get(box, 0)) for box in srs.INTERVALS]},
-            index=[f"Box {box} ({days}d)" for box, days in srs.INTERVALS.items()],
+            {T("Phrases"): [int(boxes.get(box, 0)) for box in srs.INTERVALS]},
+            index=[T("Box {box} ({days}d)", box=box, days=days) for box, days in srs.INTERVALS.items()],
         )
     )
 
-    st.subheader("Accuracy by scenario")
+    st.subheader(T("Accuracy by scenario"))
     rows = []
     for scenario in SCENARIOS:
         results = [
@@ -1226,16 +1395,16 @@ def progress_page():
         ]
         if results:
             rows.append(
-                {"Scenario": scenario["title_en"], "Answers": len(results),
-                 "Accuracy": f"{sum(results) / len(results):.0%}"}
+                {T("Scenario"): L(scenario, "title_en"), T("Answers"): len(results),
+                 T("Accuracy"): f"{sum(results) / len(results):.0%}"}
             )
     st.dataframe(pd.DataFrame(rows), hide_index=True)
 
-    with st.expander("All phrases"):
+    with st.expander(T("All phrases")):
         st.dataframe(
             pd.DataFrame(
                 [
-                    {"Phrase": CHUNK_BY_ID[chunk_id][0]["ko"], "Box": item["box"], "Next review": item["due"]}
+                    {T("Phrase"): CHUNK_BY_ID[chunk_id][0]["ko"], T("Box"): item["box"], T("Next review"): item["due"]}
                     for chunk_id, item in items.items()
                     if chunk_id in CHUNK_BY_ID
                 ]
@@ -1243,8 +1412,8 @@ def progress_page():
             hide_index=True,
         )
 
-    with st.expander("Reset progress"):
-        if st.button("Delete all progress", type="secondary"):
+    with st.expander(T("Reset progress")):
+        if st.button(T("Delete all progress"), type="secondary"):
             st.session_state.progress = {}
             save_progress()
             st.rerun()
@@ -1270,15 +1439,15 @@ def team_unlocked(what="the survey results", expanded=False):
         return True
     password = team_password()
     if not password:
-        st.caption("🔒 This part is for the project team.")
+        st.caption(T("🔒 This part is for the project team."))
         return False
     failed = st.session_state.get("team-password-failed", False)
-    with st.expander(f"🔒 Team: see {what}", expanded=expanded or failed):
+    with st.expander(T("🔒 Team: see {what}", what=T(what)), expanded=expanded or failed):
         if failed:
-            st.error("That's not the password.")
+            st.error(T("That's not the password."))
         with st.form("survey-password"):
-            attempt = st.text_input("Password", type="password")
-            if st.form_submit_button("Unlock"):
+            attempt = st.text_input(T("Password"), type="password")
+            if st.form_submit_button(T("Unlock")):
                 ok = hmac.compare_digest(attempt.encode(), password.encode())
                 st.session_state["team-unlocked"] = ok
                 st.session_state["team-password-failed"] = not ok
@@ -1288,33 +1457,33 @@ def team_unlocked(what="the survey results", expanded=False):
 
 def feedback_page():
     """Anonymous survey for classmates: usability (SUS) and learning."""
-    st.title("💬 Feedback")
+    st.title(T("💬 Feedback"))
     if st.session_state.pop("feedback-sent", False):
-        st.success("Thank you! Your answers were saved. 감사합니다! 🙏")
-    st.write(
-        "Tried a lesson or two? Please tell us what you think. It takes about 2 minutes, "
-        "it's anonymous, and it helps us improve the app."
-    )
+        st.success(T("Thank you! Your answers were saved. 감사합니다! 🙏"))
+    st.write(T(
+        "Tried a lesson or two? Please tell us what you think. It takes about 2 minutes, it's anonymous, and it "
+        "helps us improve the app."
+    ))
     with st.form("feedback", clear_on_submit=True):
-        level = st.radio("Your Korean level", survey.LEVELS, horizontal=True, index=None)
-        st.markdown("**Using the app** (1 = strongly disagree, 5 = strongly agree)")
+        level = st.radio(T("Your Korean level"), survey.LEVELS, horizontal=True, index=None, format_func=T)
+        st.markdown(T("**Using the app** (1 = strongly disagree, 5 = strongly agree)"))
         sus = [
-            st.radio(f"{number}. {question}", list(survey.SCALE), index=None, horizontal=True,
+            st.radio(f"{number}. {T(question)}", list(survey.SCALE), index=None, horizontal=True,
                      format_func=str, key=f"sus-{number}")
             for number, question in enumerate(survey.SUS_QUESTIONS, 1)
         ]
-        st.markdown("**Learning**")
+        st.markdown(T("**Learning**"))
         learning = [
-            st.radio(question, list(survey.SCALE), index=None, horizontal=True, format_func=str,
+            st.radio(T(question), list(survey.SCALE), index=None, horizontal=True, format_func=str,
                      key=f"learn-{number}")
             for number, question in enumerate(survey.LEARNING_QUESTIONS, 1)
         ]
-        useful = st.text_area("What was most useful?")
-        improve = st.text_area("What should we improve or add?")
-        sent = st.form_submit_button("Send feedback", type="primary")
+        useful = st.text_area(T("What was most useful?"))
+        improve = st.text_area(T("What should we improve or add?"))
+        sent = st.form_submit_button(T("Send feedback"), type="primary")
     if sent:
         if None in sus or None in learning:
-            st.error("Please answer every 1-5 question (the open questions are optional).")
+            st.error(T("Please answer every 1-5 question (the open questions are optional)."))
         else:
             survey.add(level, sus, learning, useful, improve)
             st.session_state["feedback-sent"] = True
@@ -1483,15 +1652,17 @@ html(f"<style>{STYLE_PATH.read_text(encoding='utf-8')}</style>")
 if st.context.theme.type == "light":
     html(f"<style>{LIGHT_STYLE_PATH.read_text(encoding='utf-8')}</style>")
 
-STORAGE_NOTES = {
-    "browser": '<span title="Your progress is stored in this browser\'s local storage. It stays when '
-               'you refresh or come back later, but not on another device or browser, and clearing '
-               'browser data deletes it.">💾 Your progress is saved only in this browser, on this device</span>',
-    "server": '<span title="Your progress is kept only on this server and is erased whenever the app '
-              'restarts (after updates or long inactivity).">💾 Progress resets when the app restarts</span>',
-    "local": '<span title="Saved in data/ on this computer.">💾 Progress is saved on this computer</span>',
+STORAGE_NOTES = {  # (text, tooltip)
+    "browser": ("💾 Your progress is saved only in this browser, on this device",
+                "Your progress is stored in this browser's local storage. It stays when you refresh or come back later, "
+                "but not on another device or browser, and clearing browser data deletes it."),
+    "server": ("💾 Progress resets when the app restarts",
+               "Your progress is kept only on this server and is erased whenever the app restarts (after updates or "
+               "long inactivity)."),
+    "local": ("💾 Progress is saved on this computer", "Saved in data/ on this computer."),
 }
-RESET_NOTE = STORAGE_NOTES[storage_mode()]
+_note, _tip = STORAGE_NOTES[storage_mode()]
+RESET_NOTE = f'<span title="{escape(T(_tip))}">{T(_note)}</span>'
 
 if login_enabled() and not st.user.is_logged_in:
     # Deployed: nobody gets past this screen without signing in with Google.
@@ -1510,13 +1681,13 @@ if login_enabled() and not st.user.is_logged_in:
     st.stop()
 
 PAGES = {
-    "Home": st.Page(home_page, title="Home", icon="🏠", url_path="home", default=True),
-    "Lesson": st.Page(lesson_page, title="Lesson", icon="📖", url_path="lesson"),
-    "Review": st.Page(review_page, title="Review", icon="🔁", url_path="review"),
-    "Progress": st.Page(progress_page, title="Progress", icon="📈", url_path="progress"),
-    "Feedback": st.Page(feedback_page, title="Feedback", icon="💬", url_path="feedback"),
+    "Home": st.Page(home_page, title=T("Home"), icon="🏠", url_path="home", default=True),
+    "Lesson": st.Page(lesson_page, title=T("Lesson"), icon="📖", url_path="lesson"),
+    "Review": st.Page(review_page, title=T("Review"), icon="🔁", url_path="review"),
+    "Progress": st.Page(progress_page, title=T("Progress"), icon="📈", url_path="progress"),
+    "Feedback": st.Page(feedback_page, title=T("Feedback"), icon="💬", url_path="feedback"),
     "Model lab": st.Page(model_lab_page, title="Model lab", icon="🔬", url_path="model-lab"),
-    "Checkpoint": st.Page(checkpoint_page, title="Checkpoint", icon="🏁", url_path="checkpoint",
+    "Checkpoint": st.Page(checkpoint_page, title=T("Checkpoint"), icon="🏁", url_path="checkpoint",
                           visibility="hidden"),
 }
 if dev_mode():
@@ -1525,7 +1696,19 @@ if dev_mode():
 navigation = st.navigation(list(PAGES.values()), position="top")
 load_from_browser()  # browser mode: this browser's saved progress, before any page reads it
 
+def choose_language():
+    if st.session_state.lang is None:  # clicked the chosen language again: keep it
+        st.session_state.lang = st.query_params.get("lang", "en")
+    st.query_params["lang"] = st.session_state.lang
+
+
+# keep ?lang=ja in the address, so a refresh or a shared link stays in Japanese
+if lang() == "ja" or "lang" in st.query_params:
+    st.query_params["lang"] = lang()
+
 with st.sidebar:
+    st.segmented_control(T("🌐 Language"), list(LANGUAGES), format_func=LANGUAGES.get, key="lang",
+                         on_change=choose_language, label_visibility="collapsed")
     items = progress()
     due_today = len(srs.due_items(items))
     mastered = sum(item["box"] == srs.MAX_BOX for item in items.values())
@@ -1533,63 +1716,65 @@ with st.sidebar:
         '<div class="side-brand">'
         '<div class="side-logo">🇰🇷</div>'
         '<div class="brand">Vocab <span>Coach</span></div>'
-        '<div class="brand-sub">부산 생활 한국어 · Korean for life in Busan</div>'
-        '<span class="wip-badge">🚧 Under construction</span>'
+        f'<div class="brand-sub">부산 생활 한국어 · {T("Korean for life in Busan")}</div>'
+        f'<span class="wip-badge">{T("🚧 Under construction")}</span>'
         "</div>"
         '<div class="side-stats">'
-        '<a class="stat due" href="review" target="_self" title="Phrases your review schedule brings back '
-        'today. Each correct answer pushes a phrase further away (1, 2, 4, 7, then 15 days); a wrong one '
-        'brings it back tomorrow. Click to review.">'
-        f'<b>{due_today}</b><span>to review</span></a>'
-        f'<div class="stat" title="Phrases you have practiced at least once"><b>{len(items)}</b>'
-        '<span>learned</span></div>'
-        f'<div class="stat" title="Phrases in the last box: you got them right 4 times in a row, '
-        f'spread over weeks"><b>{mastered}</b><span>mastered</span></div>'
+        f'<a class="stat due" href="review" target="_self" title="{escape(T("Phrases your review schedule brings back today. Each correct answer pushes a phrase further away (1, 2, 4, 7, then 15 days); a wrong one brings it back tomorrow. Click to review."))}">'
+        f'<b>{due_today}</b><span>{T("to review")}</span></a>'
+        f'<div class="stat" title="{escape(T("Phrases you have practiced at least once"))}"><b>{len(items)}</b>'
+        f'<span>{T("learned")}</span></div>'
+        f'<div class="stat" title="{escape(T("Phrases in the last box: you got them right 4 times in a row, spread over weeks"))}">'
+        f'<b>{mastered}</b><span>{T("mastered")}</span></div>'
         "</div>"
-        '<div class="side-label">Practice settings</div>'
+        f'<div class="side-label">{T("Practice settings")}</div>'
     )
     with st.container(border=True, key="side-settings"):
         st.segmented_control(
-            "Answer by",
+            T("Answer by"),
             [SPEAK, TYPE] if speech.is_available() else [TYPE],
             default=SPEAK if speech.is_available() else TYPE,
             key="answer_mode",
-            help="Speak uses the microphone and a speech-recognition model, chosen below.",
+            format_func=T,
+            help=T("Speak uses the microphone and a speech-recognition model, chosen below."),
         )
         engines = speech.available_engines()
         if len(engines) > 1:
             st.selectbox(
-                "Speech model",
+                T("Speech model"),
                 engines,
                 index=engines.index(speech.DEFAULT_ENGINE),
                 format_func=lambda e: f"{speech.ENGINES[e]['label']} · {speech.ENGINES[e]['tag']}",
                 key="asr_engine",
-                help="Compare them side by side on the 🔬 Model lab page.",
+                help=T("Compare them side by side on the 🔬 Model lab page."),
             )
-            with st.expander("About this model"):
+            with st.expander(T("About this model")):
                 engine_card(asr_engine(), compact=True)
         st.toggle(
-            "🤖 AI meaning check",
+            T("🤖 AI meaning check"),
             value=semantic.is_available(),
             disabled=not semantic.is_available(),
             key="ai_check",
-            help="Accept answers with different words but the same meaning "
-            f"(Hugging Face model {semantic.MODEL_NAME}).",
+            help=T("Accept answers with different words but the same meaning (Hugging Face model {model}).",
+                   model=semantic.MODEL_NAME),
         )
     if login_enabled():
-        st.caption(f"Signed in as **{st.user.get('name') or user_email()}**")
-        if st.button("Sign out", icon=":material/logout:", key="sign-out"):
+        st.caption(T("Signed in as **{name}**", name=st.user.get('name') or user_email()))
+        if st.button(T("Sign out"), icon=":material/logout:", key="sign-out"):
             st.logout()
     html(
-        '<div class="side-foot">Made at BUFS for international students in Busan<br>'
-        "AI project prototype · v0.1</div>"
+        f'<div class="side-foot">{T("Made at BUFS for international students in Busan")}<br>'
+        f'{T("AI project prototype · v0.1")}</div>'
     )
 
 html(
-    '<div class="wip-banner"><span title="The Korean content and voices are still being checked, '
-    'so expect rough edges.">🚧 Class prototype, still being checked</span>'
-    f'<span class="wip-sep">·</span>{RESET_NOTE}</div>'
+    f'<div class="wip-banner"><span title="{escape(T("The Korean content and voices are still being checked, so expect rough edges."))}">'
+    f'{T("🚧 Class prototype, still being checked")}</span>'
+    + (f'<span class="wip-sep">·</span><span>{T("🇯🇵 Japanese is AI-translated, still being checked")}</span>'
+       if lang() == "ja" else "")
+    + f'<span class="wip-sep">·</span>{RESET_NOTE}</div>'
 )
 
+noise_banner()
 navigation.run()
 save_to_browser()  # browser mode: write any changes back to this browser

@@ -391,6 +391,45 @@ like the free Hugging Face Space:
   same page (`coach/survey.py`, `data/feedback.json`). Next step: ask a few classmates to do a
   lesson with the pre-test and post-test, then fill in the survey.
 
+## Noisy surroundings
+
+Every spoken answer is also measured for background noise (`speech.surroundings()`): the quietest
+30 ms frames are the background, the loudest the voice. When the background is louder than
+−45 dBFS and less than 20 dB below the voice, a banner says **"Noisy surroundings detected"**
+(under 10 dB: **"Very noisy"**, with a tip to move, hold the microphone closer or switch to
+⌨️ Type), and a wrong answer adds "it was noisy, so the AI may have misheard you".
+
+The thresholds come from the app's own noise tests (30 phrases each):
+
+| Recording | Flagged |
+| --- | --- |
+| Quiet room, normal or very soft voice | never |
+| Café music 15 dB below the voice | 2 / 30 noisy |
+| Café music 10 dB below | 30 / 30 noisy |
+| Café music 5 dB below (Whisper still gets 27/28) | 30 / 30 noisy |
+| Café music as loud as the voice (Whisper gets 22/28) | 26 very noisy, 4 noisy |
+
+"Noisy" is an early heads-up: a real room with café noise measured −40 dBFS with the voice 16 dB
+above it, and recognition still worked. "Very noisy" means it will probably mishear. On your own
+computer, a 🔧 dev line under each spoken answer shows the measurement.
+
+The banner goes away when a later recording is quiet, or with its ✕.
+
+## Languages: English and 日本語
+
+Everything a learner sees comes in **English or Japanese**: a switch at the top of the sidebar,
+remembered in the address (`?lang=ja`, so a link can open straight in Japanese). On a first
+visit the app follows the browser's language. Korean, romanization and the voices never change.
+
+- **App text:** `T("English text")` in `app.py`, with the Japanese in `coach/i18n.py`. A missing
+  translation simply shows the English.
+- **Lesson content:** `data/scenarios_ja.json` holds the Japanese meaning, grammar note, common
+  mistake, role-play prompt and task for every item, keyed by the ids in `scenarios.json`. The notes
+  are adapted for Japanese speakers, not translated word for word: 잔 is compared to 杯, 은/는 to
+  は, and 잘 부탁드려요 to よろしくお願いします.
+- **Status:** the Japanese is AI-translated and shows a "確認中" note in the banner until a native
+  speaker has checked it. The team-only areas (Model lab, survey results) stay in English.
+
 ## Run
 
 To put it online (no sign-in; progress stays in each learner's browser, and one team password
@@ -430,11 +469,14 @@ coach/              the building blocks the app uses
   srs.py              Leitner spaced repetition
   learning_tests.py   pre-test / post-test and checkpoint results, learning gains
   survey.py           feedback survey (SUS usability score + learning questions)
+  i18n.py             English / Japanese: the language switch and the app's Japanese text
+  warmup.py           loads the AI models in the background when a lesson opens
   music.py            café music with sung lyrics, for noise tests and the Model lab
 assets/             look and browser parts: style.css, style-light.css,
                     conversation_player.html, time_attack.js/.css, browser_store.js
 data/
   scenarios.json      scenarios, dialogues, phrases, role-plays
+  scenarios_ja.json   Japanese translations of all lesson content
   levels.json         levels, checkpoints (story role-plays), coming-soon scenarios
   audio/              voice lines (MP3) and the joined conversation tracks
   noise/              sung lyric lines for the music test
