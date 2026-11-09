@@ -1,7 +1,7 @@
 # How we built Scenario Vocab Coach
 
 The story of the project, step by step: what we decided, what we tried, what went wrong,
-and how we fixed it. For how the app works in detail, see [README.md](../README.md); for putting
+and how we fixed it. For how the app works in detail, see [HOW_IT_WORKS.md](HOW_IT_WORKS.md); for putting
 it online, see [DEPLOY.md](DEPLOY.md).
 
 ---
@@ -28,7 +28,7 @@ it online, see [DEPLOY.md](DEPLOY.md).
 
 ### 2. Planning before building
 - Wrote a plan first: content format, files, learning loop, how to test it.
-- Grounded the design in learning research (see the README table):
+- Grounded the design in learning research (see the table in HOW_IT_WORKS.md):
   - **Retrieval practice:** recalling beats rereading.
   - **Spaced repetition:** reviews spread out over days.
   - **Lexical chunks:** whole phrases, not single words.
