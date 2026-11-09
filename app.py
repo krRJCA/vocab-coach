@@ -15,6 +15,7 @@ import hmac
 import os
 import json
 import random
+import re
 import time
 from html import escape
 from datetime import date
@@ -26,6 +27,7 @@ import streamlit as st
 from coach import learning_tests, semantic, speech, srs, survey, warmup
 from coach.i18n import LANGUAGES, L, T, add_japanese, lang
 from coach.checker import check, check_spoken
+from coach.icons import svg
 
 try:  # dev-only tools (Voice check) live in dev/voice_check.py, which is never deployed
     from dev import voice_check as dev_tools
@@ -211,6 +213,20 @@ def record(chunk_id, correct):
 
 def html(markup):
     st.markdown(markup, unsafe_allow_html=True)
+
+
+def icon_steps(steps, more=None):
+    """Instructions as a row of icon chips (icon, short label) instead of a paragraph.
+    more: the full explanation, behind a small ⓘ that opens on tap (hover tooltips don't
+    work on phones)."""
+    chips = '<span class="icon-arrow">›</span>'.join(
+        f'<span class="icon-step">{svg(icon)}<span>{escape(label)}</span></span>' for icon, label in steps
+    )
+    extra = ""
+    if more:
+        text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", escape(more))
+        extra = f'<details class="more"><summary title="{escape(T("More"))}">i</summary><div>{text}</div></details>'
+    html(f'<div class="icon-steps">{chips}{extra}</div>')
 
 
 def go(page, scenario_id=None):
@@ -701,17 +717,17 @@ def home_page():
 
     st.subheader(T("How a lesson works"))
     steps = [
-        (T("Situation"), T("Listen to a real dialogue.")),
-        (T("Notice"), T("Study the key phrases and common mistakes.")),
-        (T("Recall"), T("Type or say each phrase from memory.")),
-        (T("Role-play"), T("Use the phrases in a new conversation.")),
+        ("chat", T("Situation"), T("Listen to a real dialogue.")),
+        ("notice", T("Notice"), T("Study the key phrases and common mistakes.")),
+        ("recall", T("Recall"), T("Type or say each phrase from memory.")),
+        ("roleplay", T("Role-play"), T("Use the phrases in a new conversation.")),
     ]
     html(
         '<div class="steps">'
         + "".join(
-            f'<div class="step"><div class="step-number">{number}</div>'
+            f'<div class="step"><div class="step-icon">{svg(icon)}<span>{number}</span></div>'
             f"<b>{title}</b><small>{text}</small></div>"
-            for number, (title, text) in enumerate(steps, 1)
+            for number, (icon, title, text) in enumerate(steps, 1)
         )
         + "</div>"
     )
@@ -952,7 +968,8 @@ def lesson_page():
                 )
 
     with recall_tab:
-        st.write(T("Type or say each phrase in Korean. Every answer goes into your review schedule."))
+        icon_steps([("read", T("See the meaning")), ("mic", T("Say it in Korean")), ("calendar", T("It comes back to review"))],
+                   more=T("Type or say each phrase in Korean. Every answer goes into your review schedule."))
         recall_session(
             [chunk["id"] for chunk in scenario["chunks"]],
             state_key=f"lesson-{scenario_id}",
@@ -1013,10 +1030,12 @@ def roleplay(scenario):
     answers = st.session_state.setdefault(answers_key, [])
     round_ = st.session_state.setdefault(f"{answers_key}-round", 0)
     if timed:
-        st.write(T("Their line plays, then **you have a few seconds to answer**, no pausing. "
-                   "Recording starts and stops by itself. Read the task first!"))
+        icon_steps([("read", T("Read the task")), ("listen", T("Listen")), ("timer", T("Answer within seconds"))],
+                   more=T("Their line plays, then **you have a few seconds to answer**, no pausing. "
+                          "Recording starts and stops by itself. Read the task first!"))
     else:
-        st.write(T("A new conversation. Listen to what they say, then reply in Korean to complete the task."))
+        icon_steps([("listen", T("Listen")), ("mic", T("Reply in Korean")), ("target", T("Complete the task"))],
+                   more=T("A new conversation. Listen to what they say, then reply in Korean to complete the task."))
     listening = st.toggle(
         T("🎧 Listening practice: hide their words until you ask"), key=f"{answers_key}-listening"
     )
@@ -1285,12 +1304,10 @@ def test_section(scenario):
     pre, post, gain = learning_tests.summary(tests, scenario["id"])
     if done := st.session_state.pop(f"test-done-{scenario['id']}", None):
         st.success(T("{title} finished: {correct} / {total} phrases known.", title=done[0], correct=done[1], total=done[2]))
-    st.write(T(
-        "Measure what this lesson teaches you. Take the **pre-test before** you start "
-        "(it's fine to know nothing yet!) and the **post-test after** studying. Each test asks "
-        "every phrase from its English meaning, with no hints. You see the answers at the end. "
-        "Tests don't change your review schedule."
-    ))
+    icon_steps([("test", T("Pre-test")), ("study", T("Study")), ("test", T("Post-test")), ("chart", T("See your gain"))],
+               more=T("Measure what this lesson teaches you. Take the **pre-test before** you start (it's fine to know nothing "
+                      "yet!) and the **post-test after** studying. Each test asks every phrase from its English meaning, with no "
+                      "hints. You see the answers at the end. Tests don't change your review schedule."))
     columns = st.columns(3)
     columns[0].metric(T("Pre-test"), "–" if pre is None else f"{pre:.0%}")
     columns[1].metric(T("Post-test"), "–" if post is None else f"{post:.0%}")
@@ -1350,13 +1367,13 @@ def checkpoint_page():
                 st.warning(T("Not yet: {correct} / {total} ({pct}). You need {need}. Review: {names}, then try again.",
                              correct=done[1], total=done[2], pct=f"{score:.0%}",
                              need=f"{checkpoint.get('pass', 0.8):.0%}", names=names))
-        st.write(T(
-            "{n} phrases, {per} from each Level {level} lesson, mixed together. No hints and no feedback until the "
-            "end, just like a lesson test. Score {pct} or more to complete the level. You can take it anytime, even "
-            "before the lessons, to see if you can skip ahead.",
-            n=len(items), per=checkpoint.get('test_per_scenario', 2), level=number,
-            pct=f"{checkpoint.get('pass', 0.8):.0%}",
-        ))
+        pass_pct = f"{checkpoint.get('pass', 0.8):.0%}"
+        icon_steps([("test", T("{n} phrases", n=len(items))), ("shuffle", T("Mixed")), ("nohint", T("No hints")),
+                    ("target", T("{pct} to pass", pct=pass_pct))],
+                   more=T("{n} phrases, {per} from each Level {level} lesson, mixed together. No hints and no feedback until the "
+                          "end, just like a lesson test. Score {pct} or more to complete the level. You can take it anytime, even "
+                          "before the lessons, to see if you can skip ahead.",
+                          n=len(items), per=checkpoint.get('test_per_scenario', 2), level=number, pct=pass_pct))
         columns = st.columns(3)
         columns[0].metric(T("Best score"), "–" if best is None else f"{best:.0%}")
         columns[1].metric(T("Last attempt"), "–" if latest is None else f"{latest:.0%}")
@@ -1366,8 +1383,9 @@ def checkpoint_page():
         if (tests.get(checkpoint_id) or {}).get("checkpoint"):
             show_test_answers(tests[checkpoint_id]["checkpoint"][-1], "Answers from your last attempt")
     with story_tab:
-        st.write(T("One turn from each part of the level, in a row, like a real day out. Practice it here; the story isn't "
-                   "scored for passing."))
+        icon_steps([("roleplay", T("One turn per lesson")), ("repeat", T("Practice, not scored"))],
+                   more=T("One turn from each part of the level, in a row, like a real day out. Practice it here; the story isn't "
+                          "scored for passing."))
         story = {"id": checkpoint_id, "roleplay": checkpoint["roleplay"],
                  "chunks": [chunk for scenario in scenarios for chunk in scenario["chunks"]]}
         roleplay(story)

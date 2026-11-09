@@ -447,6 +447,23 @@ JA = {
     "Made at BUFS for international students in Busan": "釜山外大で、釜山の留学生のために制作",
     "AI project prototype · v0.1": "AIプロジェクト試作版 · v0.1",
     "🌐 Language": "🌐 言語",
+    # ---- icon steps (short labels; the full sentence is behind ⓘ)
+    "More": "詳しく",
+    "See the meaning": "意味を見る",
+    "Say it in Korean": "韓国語で言う",
+    "It comes back to review": "あとで復習に出る",
+    "Read the task": "課題を読む",
+    "Listen": "聞く",
+    "Answer within seconds": "数秒以内に答える",
+    "Reply in Korean": "韓国語で返事",
+    "Complete the task": "課題をクリア",
+    "Study": "学ぶ",
+    "See your gain": "伸びを見る",
+    "Mixed": "ランダム出題",
+    "No hints": "ヒントなし",
+    "{pct} to pass": "{pct}で合格",
+    "One turn per lesson": "各レッスンから1ターン",
+    "Practice, not scored": "練習（採点なし）",
     # ---- noisy surroundings
     "🔊 **Noisy surroundings detected.** The AI may mishear some words. A quieter spot, or holding the microphone "
     "closer, will help.":

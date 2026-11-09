@@ -536,3 +536,27 @@ a.stat.due:hover { transform: translateY(-2px); border-color: var(--camellia); }
 .ta-time { font-size: 0.8rem; opacity: 0.6; white-space: nowrap; }
 .ta-legend { font-size: 0.75rem; opacity: 0.6; margin-top: 0.5rem; }
 @media (max-width: 480px) { .ta-score-big { font-size: 2.1rem; } .ta-score { gap: 0.75rem; } }
+
+/* Instructions as icon chips (app.py: icon_steps) */
+.icon-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.4rem; margin: 0.2rem 0 0.8rem; }
+.icon-step { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.85rem 0.4rem 0.6rem;
+  border-radius: 999px; background: rgba(201, 58, 87, 0.08); border: 1px solid rgba(201, 58, 87, 0.2);
+  font-size: 0.93rem; font-weight: 500; line-height: 1.2; }
+.icon-step svg { width: 20px; height: 20px; color: var(--camellia, #c93a57); flex-shrink: 0; }
+.icon-arrow { opacity: 0.45; font-size: 1.1rem; }
+details.more { display: inline-block; }
+details.more summary { list-style: none; cursor: pointer; width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center; font: italic 600 0.9rem Georgia, serif;
+  border: 1px solid rgba(128, 128, 128, 0.45); opacity: 0.7; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more[open] { flex-basis: 100%; }
+details.more[open] summary { opacity: 1; }
+details.more > div { margin-top: 0.4rem; font-size: 0.9rem; line-height: 1.55; opacity: 0.85; }
+/* Home: icons for the four lesson steps */
+.step-icon { position: relative; width: 2.6rem; height: 2.6rem; border-radius: 0.8rem; margin-bottom: 0.55rem;
+  display: flex; align-items: center; justify-content: center; background: rgba(201, 58, 87, 0.14);
+  color: var(--camellia, #c93a57); }
+.step-icon svg { width: 1.45rem; height: 1.45rem; }
+.step-icon span { position: absolute; top: -0.35rem; right: -0.35rem; width: 1.15rem; height: 1.15rem; border-radius: 50%;
+  background: var(--camellia, #c93a57); color: #fff; font-size: 0.7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; }
