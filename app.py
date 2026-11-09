@@ -845,9 +845,29 @@ def next_up(step, key):
         st.button(T("Continue →"), key=f"{key}-continue", on_click=goto, args=(following,), type="primary")
 
 
+def remembered_tabs(page_id, names):
+    """Tabs that stay on the chosen tab when the page redraws.
+
+    Plain st.tabs fall back to the first tab whenever Streamlit rebuilds them (for example the
+    first time the time-attack recorder appears), which threw learners back to the dialogue.
+    Here the server remembers the tab, per lesson; the labels depend on the language, so the
+    memory is the tab's position and each language gets its own widget key."""
+    labels = [T(name) for name in names]
+    memory = st.session_state.setdefault("lesson-tabs", {})
+    key = f"tabs-{page_id}-{lang()}"
+
+    def remember():
+        chosen = st.session_state.get(key)
+        if chosen in labels:
+            memory[page_id] = labels.index(chosen)
+
+    st.session_state[key] = labels[min(memory.get(page_id, 0), len(labels) - 1)]
+    return st.tabs(labels, key=key, on_change=remember)
+
+
 def choose_level():
     """Level switch callback: open that level's first lesson (or stay if it's already there)."""
-    number = st.session_state.get("lesson-level")
+    number = st.session_state.get(f"lesson-level-{lang()}")
     if number and LEVEL_NUMBER.get(st.session_state.get("scenario")) != number:
         st.session_state.scenario = LEVELS[number - 1]["scenarios"][0]
 
@@ -856,27 +876,34 @@ def lesson_page():
     preload_models()
     follow_goto("Lesson")
     scroll_to_top()
-    st.session_state.setdefault("scenario", SCENARIOS[0]["id"])
+    if st.session_state.get("scenario") not in SCENARIO_BY_ID:  # never trust a stale or odd value
+        st.session_state.scenario = SCENARIOS[0]["id"]
     course_nav(("lesson", st.session_state.scenario), "lesson-top")
-    # Pick a level first, then one of that level's lessons (folded away: Previous / Next cover most moves)
-    st.session_state["lesson-level"] = LEVEL_NUMBER[st.session_state.scenario]
+    # Pick a level first, then one of that level's lessons (folded away: Previous / Next cover most moves).
+    # The pickers' labels depend on the language, and Streamlit loses a picker's value when its labels
+    # change, so each language gets its own picker; the lesson itself lives in st.session_state.scenario.
+    level_key, lesson_key = f"lesson-level-{lang()}", f"lesson-pick-{lang()}"
+    st.session_state[level_key] = LEVEL_NUMBER[st.session_state.scenario]
     jump = st.expander(T("🔀 Jump to another lesson"))
     pick_level, pick_lesson = jump.columns([1, 2], vertical_alignment="bottom")
     pick_level.segmented_control(
         T("Level"),
         list(range(1, len(LEVELS) + 1)),
         format_func=lambda n: T("Level {n}", n=n),
-        key="lesson-level",
+        key=level_key,
         on_change=choose_level,
     )
-    level_lessons = LEVELS[st.session_state["lesson-level"] - 1]["scenarios"]
-    scenario_id = pick_lesson.selectbox(
+    level_lessons = LEVELS[LEVEL_NUMBER[st.session_state.scenario] - 1]["scenarios"]
+    st.session_state[lesson_key] = st.session_state.scenario
+    pick_lesson.selectbox(
         T("Lesson"),
         level_lessons,
         format_func=lambda sid: f"{level_lessons.index(sid) + 1}. {SCENARIO_BY_ID[sid]['icon']} "
                                 f"{L(SCENARIO_BY_ID[sid], 'title_en')} · {SCENARIO_BY_ID[sid]['title_ko']}",
-        key="scenario",
+        key=lesson_key,
+        on_change=lambda: st.session_state.update(scenario=st.session_state[lesson_key]),
     )
+    scenario_id = st.session_state.scenario
     scenario = SCENARIO_BY_ID[scenario_id]
 
     html(
@@ -887,8 +914,8 @@ def lesson_page():
         f'<p>{escape(L(scenario, "situation_en"))}</p></div></div>'
     )
 
-    situation_tab, notice_tab, recall_tab, roleplay_tab, test_tab = st.tabs(
-        [T("1 · Situation"), T("2 · Notice"), T("3 · Recall"), T("4 · Role-play"), T("📝 Test")]
+    situation_tab, notice_tab, recall_tab, roleplay_tab, test_tab = remembered_tabs(
+        scenario_id, ["1 · Situation", "2 · Notice", "3 · Recall", "4 · Role-play", "📝 Test"]
     )
 
     with situation_tab:
@@ -1231,8 +1258,8 @@ def checkpoint_page():
         f'<h1>{escape(checkpoint["title_ko"])}</h1>'
         f'<p>{escape(L(checkpoint, "title_en"))}{T(". ")}{escape(L(checkpoint, "situation_en"))}</p></div></div>'
     )
-    test_tab, story_tab = st.tabs([T("📝 Mixed test ({n} phrases)", n=len(items)),
-                                   T("🗣️ Story role-play ({n} turns)", n=len(checkpoint['roleplay']))])
+    test_tab, story_tab = remembered_tabs(checkpoint_id, [T("📝 Mixed test ({n} phrases)", n=len(items)),
+                                                         T("🗣️ Story role-play ({n} turns)", n=len(checkpoint['roleplay']))])
     with test_tab:
         test_pool = {"id": checkpoint_id, "chunks": [CHUNK_BY_ID[i][0] for i in items]}
         if run_test(checkpoint_id, scenario_hint(test_pool)):

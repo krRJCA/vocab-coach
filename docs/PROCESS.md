@@ -212,6 +212,15 @@ it online, see [DEPLOY.md](DEPLOY.md).
 - **Two bugs caught while testing:** the new banner pushed the lesson tabs down, which made
   Streamlit jump back to the first tab (fixed with a fixed slot), and background loading slowed
   the first lesson by ~2 s (fixed by starting it 3 s later).
+- **Bugs found by using it on a real phone, in Japanese:**
+  - Switching language while on a lesson crashed it: the lesson picker's labels changed language,
+    and Streamlit handed back the label instead of the lesson. The lesson now lives apart from the
+    pickers, and a bad value can't crash the page.
+  - The first time a learner chose Time attack, the page jumped back to the Situation tab while the
+    recorder ran out of sight. The lesson tabs now remember where you are.
+  - iPhones only allow sound that a tap started, so every automatic turn after the first played
+    silently and heard nothing. The recorder now reuses the sound engine unlocked by the first tap,
+    and on narrow screens the timer and instructions stack instead of squeezing side by side.
 
 ---
 

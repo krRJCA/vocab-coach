@@ -44,3 +44,11 @@
 }
 @media (prefers-reduced-motion: reduce) { [data-state="recording"] .ta-button { animation: none; } }
 .ta-status { font-size: 1rem; font-weight: 500; }
+
+/* Phones: the ring on top, the instructions centred under it, instead of squeezed side by side */
+@media (max-width: 480px) {
+  .ta { padding: 0.9rem 0.9rem 1rem; }
+  .ta-stage { flex-direction: column; gap: 0.7rem; text-align: center; }
+  .ta-ring { width: 88px; height: 88px; }
+  .ta-status { font-size: 0.95rem; }
+}

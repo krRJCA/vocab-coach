@@ -12,6 +12,25 @@ const MIN_SPEECH = 0.25;     // seconds of speech needed before quiet can end it
 // One microphone stream for the whole page, so the browser asks only once.
 const shared = (window.__timeAttack = window.__timeAttack || { stream: null, done: new Set() });
 
+// Phones (iOS Safari especially) only allow sound and audio processing that a tap started.
+// Only the first turn begins with a tap, so create the audio engine and the player once, then,
+// and reuse them for every later turn; a new AudioContext or Audio() without a tap stays silent.
+function audioEngine() {
+  if (!shared.context || shared.context.state === "closed") {
+    shared.context = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (shared.context.state === "suspended") shared.context.resume().catch(() => {});
+  return shared.context;
+}
+
+function player() {
+  if (!shared.player) {
+    shared.player = new Audio();
+    shared.player.setAttribute("playsinline", "");
+  }
+  return shared.player;
+}
+
 async function microphone() {
   if (!shared.stream || !shared.stream.active) {
     shared.stream = await navigator.mediaDevices.getUserMedia({
@@ -123,6 +142,8 @@ export default function (component) {
 
   async function run() {
     button.disabled = true;
+    audioEngine(); // inside the tap on the first turn: unlocks sound for every later turn
+    player();
     let stream;
     try {
       stream = await microphone();
@@ -131,12 +152,14 @@ export default function (component) {
       button.disabled = false;
       return;
     }
-    const context = new AudioContext();
+    const context = audioEngine();
+    if (context.state === "suspended") await context.resume().catch(() => {});
 
     // 1. The other person speaks
     show("🔊", data.listen_text, "listening");
     if (data.audio) {
-      const voice = new Audio(data.audio);
+      const voice = player();
+      voice.src = data.audio;
       await new Promise((resolve) => {
         voice.onended = resolve;
         voice.onerror = resolve;
@@ -148,7 +171,8 @@ export default function (component) {
     beep(context);
     const analyser = context.createAnalyser();
     analyser.fftSize = 1024;
-    context.createMediaStreamSource(stream).connect(analyser);
+    const source = context.createMediaStreamSource(stream);
+    source.connect(analyser);
     const samples = new Float32Array(analyser.fftSize);
     const recorder = new MediaRecorder(stream);
     const chunks = [];
@@ -183,7 +207,7 @@ export default function (component) {
     recorder.stop();
     await stopped;
     beep(context, 520);
-    context.close();
+    source.disconnect(); // keep the engine for the next turn (see audioEngine)
     const spoke = speechTime >= MIN_SPEECH;
     show(spoke ? "✓" : "⏰", spoke ? say("Got it. Checking…") : say("Time's up!"), "done");
     shared.done.add(data.turn_id);
