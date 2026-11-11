@@ -481,4 +481,79 @@ JA = {
     "I couldn't hear your words over the background noise. Try a quieter spot, or hold the microphone closer.":
         "周りの音で、あなたの言葉が聞き取れませんでした。静かな場所に移るか、マイクを口に近づけてください。",
     "🔊 It was noisy where you recorded, so the AI may have misheard you.": "🔊 録音した場所がうるさかったので、AIが聞き間違えたかもしれません。",
+    # onboarding tour
+    "👋 Welcome to Vocab Coach": "👋 Vocab Coachへようこそ",
+    "Learn the Korean you need in Busan, one real situation at a time. Here's a 1-minute tour of how it works.":
+        "釜山で本当に使う韓国語を、実際の場面ごとに学びます。使い方を1分でご案内します。",
+    "Real situations, not word lists": "単語リストではなく、実際の場面",
+    "Each lesson is a place you'll really go: a café, the metro, a pharmacy. You learn the <b>whole phrases</b> people use there.":
+        "各レッスンは、カフェ、地下鉄、薬局など、実際に行く場所です。そこで使われる<b>フレーズ丸ごと</b>を学びます。",
+    "Every lesson, step by step": "レッスンの流れ",
+    "<b>1 Situation:</b> listen to a real conversation. <b>2 Notice:</b> study the phrases. "
+    "<b>3 Recall:</b> say them from memory. <b>4 Role-play:</b> use them in a new conversation. "
+    "A short 📝 test before and after shows what you learned.":
+        "<b>1 場面：</b>実際の会話を聞く。<b>2 気づく：</b>フレーズを学ぶ。<b>3 思い出す：</b>何も見ずに言う。"
+        "<b>4 ロールプレイ：</b>新しい会話で使う。学習の前後の短い📝テストで、どれだけ身についたかが分かります。",
+    "Start here": "ここから始めましょう",
+    "Lessons go from easy to harder. Begin with {lesson}, then work along Level 1.":
+        "レッスンはやさしい順に並んでいます。{lesson}から始めて、レベル1を順に進みましょう。",
+    "🏁 The checkpoint": "🏁 チェックポイント",
+    "After Level 1, a mixed test checks you're ready for Level 2. Already know some Korean? Try it first: it works as a placement test.":
+        "レベル1の後は、まとめテストでレベル2に進む準備ができたか確認します。韓国語を少し知っている人は、"
+        "先に受けてみてください。レベル分けテストとしても使えます。",
+    "Come back every day": "毎日少しずつ",
+    "<b>🔁 Review</b> brings phrases back just before you'd forget them. <b>📈 Progress</b> shows how far you've come.":
+        "<b>🔁 復習</b>は、忘れかけたころにフレーズをもう一度出します。<b>📈 記録</b>で、どこまで進んだかが分かります。",
+    "Your phrases at a glance": "フレーズの状況がひと目で",
+    "How many phrases are due for review today, how many you've learned, and how many you've mastered.":
+        "今日復習するフレーズの数、学んだ数、マスターした数が表示されます。",
+    "Speak or type": "話す、または打つ",
+    "Answer with your <b>🎙️ voice</b> (allow the microphone) or <b>⌨️ type</b>. Speaking works best somewhere quiet.":
+        "<b>🎙️ 声</b>（マイクを許可してください）か<b>⌨️ キーボード</b>で答えます。話すときは静かな場所がおすすめです。",
+    "English or 日本語": "English または 日本語",
+    "Switch the app's language here anytime. The Korean stays the same.":
+        "アプリの言語はここでいつでも切り替えられます。韓国語はそのままです。",
+    "You're ready! 🎉": "準備完了！🎉",
+    "Your progress is saved in this browser. You can replay this tour anytime from the sidebar.":
+        "学習記録はこのブラウザに保存されます。このツアーはサイドバーからいつでも見直せます。",
+    "Next →": "次へ →",
+    "← Back": "← 戻る",
+    "Skip tour": "ツアーをスキップ",
+    "Close": "閉じる",
+    "Start {lesson} →": "{lesson}を始める →",
+    "Step {n} of {total}": "{n} / {total}",
+    "🧭 Take the tour": "🧭 使い方ツアー",
+    "📖 Inside a lesson": "📖 レッスンの中身",
+    "Every lesson has the same five parts. Let's look at each one.": "どのレッスンも同じ5つのパートでできています。順番に見てみましょう。",
+    "The situation": "場面",
+    "Where you are and what happens. Everything in this lesson is for this one real situation.":
+        "どこにいて、何が起きるか。このレッスンの内容はすべて、この実際の場面のためのものです。",
+    "Listen to the whole conversation. Tap any line to hear it again, slow it down, "
+    "or hide the romanization and English when you're ready.":
+        "会話全体を聞きます。どの行もタップすればもう一度聞けて、速度を落とすこともできます。"
+        "慣れたらローマ字と訳を隠しましょう。",
+    "The key phrases, one card each: the sound, the meaning, how polite it is, and a common mistake to avoid.":
+        "大事なフレーズを1枚ずつのカードで。音声、意味、丁寧さ、よくある間違いが分かります。",
+    "See the meaning, then <b>say or type the Korean</b> from memory. Getting it right moves it into your review schedule.":
+        "意味を見て、何も見ずに<b>韓国語を話すか打ちます</b>。正解すると復習スケジュールに入ります。",
+    "A new conversation in the same place. <b>🗣️ Practice</b> at your own pace, or try <b>⏱️ Time attack</b>: "
+    "answer in a few seconds, like a real chat.":
+        "同じ場所での新しい会話です。<b>🗣️ 練習</b>で自分のペースで、または<b>⏱️ タイムアタック</b>で"
+        "本当の会話のように数秒で答えましょう。",
+    "Take it before you study and again after. The 📈 Progress page shows how much you learned.":
+        "学習の前と後に受けます。📈 記録ページで、どれだけ身についたかが分かります。",
+    "Moving on": "次へ進む",
+    "Go to the previous or next lesson here, or back to all lessons.": "ここから前後のレッスンや、レッスン一覧に移動できます。",
+    "Your turn! 🎧": "さあ、始めましょう！🎧",
+    "Start with <b>1 · Situation</b> and listen to the conversation.": "まず<b>1 · 場面</b>で会話を聞いてみましょう。",
+    "Let's go →": "始める →",
+    "Switch to light mode": "ライトモードに切り替え",
+    "Switch to dark mode": "ダークモードに切り替え",
+    # short versions for phones
+    "🚧 Prototype": "🚧 試作版",
+    "🇯🇵 AI-translated": "🇯🇵 AI翻訳",
+    "💾 Saved in this browser": "💾 このブラウザに保存",
+    "💾 Resets on restart": "💾 再起動でリセット",
+    "💾 Saved on this computer": "💾 このPCに保存",
+    "Real Korean for real situations in Busan.": "釜山の場面で使う、本物の韓国語。",
 }

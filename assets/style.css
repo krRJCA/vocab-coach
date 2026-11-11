@@ -560,3 +560,202 @@ details.more > div { margin-top: 0.4rem; font-size: 0.9rem; line-height: 1.55; o
 .step-icon span { position: absolute; top: -0.35rem; right: -0.35rem; width: 1.15rem; height: 1.15rem; border-radius: 50%;
   background: var(--camellia, #c93a57); color: #fff; font-size: 0.7rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center; }
+
+/* ---------- Onboarding tour (assets/tour.js): a layer over the whole site ---------- */
+.vc-tour { position: fixed; inset: 0; z-index: 1000100; pointer-events: none; }
+.vc-tour-shade { position: absolute; inset: 0; pointer-events: auto; }
+.vc-tour-spot {
+  position: fixed; border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 4px rgba(255, 159, 177, 0.9), 0 0 0 200vmax rgba(8, 14, 26, 0.62);
+  transition: top .35s ease, left .35s ease, width .35s ease, height .35s ease;
+}
+.vc-tour-centred .vc-tour-spot { top: 50%; left: 50%; width: 0; height: 0; box-shadow: 0 0 0 200vmax rgba(8, 14, 26, 0.62); }
+.vc-tour-card {
+  position: fixed; width: min(360px, calc(100vw - 24px)); pointer-events: auto;
+  background: var(--harbor); color: #f4efe8; border-radius: 16px; padding: 18px 20px 16px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: top .35s ease, left .35s ease;
+}
+.vc-tour-centred .vc-tour-card { top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100vw - 24px)); }
+.vc-tour-phone:not(.vc-tour-centred) .vc-tour-card { left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; }
+.vc-tour-enter { animation: vc-tour-in .28s ease both; }
+.vc-tour-centred .vc-tour-enter { animation-name: vc-tour-in-centre; }
+@keyframes vc-tour-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
+@keyframes vc-tour-in-centre { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .vc-tour-spot, .vc-tour-card { transition: none; }
+  .vc-tour-enter { animation: none; }
+}
+.vc-tour-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.vc-tour-count { font-size: 0.78rem; letter-spacing: .06em; text-transform: uppercase; color: #ff9fb1; font-weight: 600; }
+.vc-tour-title { font-family: var(--serif); font-size: 1.3rem; line-height: 1.3; margin: 0 0 6px; padding: 0; color: inherit; }
+.vc-tour-body { font-size: 0.95rem; line-height: 1.55; margin: 0; opacity: .92; }
+.vc-tour-dots { display: flex; gap: 5px; margin: 14px 0 12px; }
+.vc-tour-dots span { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .25); transition: width .25s ease; }
+.vc-tour-dots span.on { width: 18px; background: #ff9fb1; }
+.vc-tour-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+.vc-tour button {
+  font: inherit; font-size: 0.92rem; border-radius: 10px; cursor: pointer; padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, .22); background: transparent; color: inherit;
+}
+.vc-tour .vc-tour-next { background: var(--camellia); border-color: var(--camellia); color: #fff; font-weight: 600; }
+.vc-tour .vc-tour-next:hover { filter: brightness(1.08); }
+.vc-tour .vc-tour-skip { border: none; padding: 4px 6px; font-size: 0.85rem; opacity: .75; }
+.vc-tour .vc-tour-skip:hover { opacity: 1; text-decoration: underline; }
+.vc-tour button:focus-visible { outline: 2px solid #ff9fb1; outline-offset: 2px; }
+
+/* ---------- Light / dark switch in the top-right bar (assets/theme_switch.js) ---------- */
+.st-key-theme-switch-slot { display: none; }  /* the component only adds the button to the bar */
+/* one theme switch is enough: hide the copy in Streamlit's ⋮ menu (the button above still uses it) */
+[data-testid="stThemeSwitcher"],
+[data-testid="stThemeSwitcher"] + [data-testid="stMainMenuDivider"] { display: none !important; }
+
+/* invisible helpers (style sheets, the theme switch, the tours) shouldn't add page spacing */
+[data-testid="stLayoutWrapper"]:has(> .st-key-theme-switch-slot),
+[data-testid="stLayoutWrapper"]:has(> .st-key-app-styles),
+[data-testid="stElementContainer"][class*="st-key-tour-"] { display: none !important; }
+.vc-theme-switch {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; margin-right: 0.25rem; padding: 0;
+  border: none; border-radius: 0.5rem; background: transparent; color: inherit; cursor: pointer;
+  opacity: 0.8; transition: background-color .15s ease, opacity .15s ease;
+}
+.vc-theme-switch svg { width: 1.15rem; height: 1.15rem; }
+.vc-theme-switch:hover { opacity: 1; background: rgba(128, 128, 128, 0.15); }
+.vc-theme-switch:focus-visible { outline: 2px solid var(--camellia); outline-offset: 2px; opacity: 1; }
+
+.level-lock { font-size: 0.85rem; opacity: 0.75; margin: 0 0 0.6rem; }
+
+/* Korean wraps at spaces, not between any two syllables (주세 / 요) */
+.ko, .ko-line, .card-title, .lesson-head h1, .hero-kicker { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* ---------- Phones: less scrolling, shorter text, left-aligned reading ---------- */
+/* Long and short versions of the same note: the short one only on phones */
+.wip-long { display: contents; }
+.wip-short, .hero-short { display: none; }
+
+@media (max-width: 640px) {
+  /* a little less empty space around the page */
+  [data-testid="stMainBlockContainer"] { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 3.6rem !important; }
+  [data-testid="stMain"] h2, [data-testid="stMain"] h3 { margin-top: 1rem !important; }
+
+  /* notices: one short line */
+  .wip-long { display: none; }
+  .wip-short { display: contents; }
+  .wip-banner { font-size: 0.78rem !important; padding: 0.35rem 0.8rem !important; margin-bottom: 0.9rem !important; }
+
+  /* home banner: about half a screen instead of a full one */
+  .hero { padding: 1.3rem 1.2rem 1.6rem; border-radius: 1rem; }
+  .hero-kicker { font-size: 0.72rem; }
+  .hero h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+  .hero-long { display: none; }
+  .hero-short { display: block; font-size: 0.98rem; margin-bottom: 0.9rem; }
+  .kicker-en { display: none; }
+  .hero-stats { gap: 0.35rem; }
+  .hero-stats span { font-size: 0.74rem; padding: 0.2rem 0.6rem; }
+
+  /* how a lesson works: a 2 × 2 grid of small tiles */
+  .steps { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .step { padding: 0.7rem 0.75rem; }
+  .step .step-icon { transform: scale(0.85); transform-origin: left top; margin-bottom: -0.2rem; }
+  .step b { font-size: 0.95rem; }
+  .step small { font-size: 0.78rem; line-height: 1.4; display: block; }
+
+  .level-head b { font-size: 1.15rem; }
+  .level-head .pill { margin-left: 0; }
+  .level-desc { display: none; }
+
+
+  /* lesson: back and next on one row (previous is one tap away in "All lessons") */
+  [class*="st-key-course-nav"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: 0.5rem; }
+  [class*="st-key-course-nav"] [data-testid="stColumn"] { min-width: 0 !important; width: auto !important; flex: 1 1 0 !important; }
+  [class*="st-key-course-nav"] [data-testid="stColumn"]:nth-child(2) { display: none; }
+  [class*="st-key-course-nav"] [data-testid="stColumn"]:first-child { flex: 0 0 auto !important; }
+
+  /* lesson header: compact, text across the full width */
+  .lesson-head { padding: 1rem 1.05rem !important; gap: 0.75rem; align-items: flex-start; }
+  .lesson-icon { font-size: 1.7rem; width: 2.8rem; height: 2.8rem; border-radius: 0.75rem; }
+  .lesson-head h1 { font-size: 1.45rem; line-height: 1.3; }
+  .lesson-head p { font-size: 0.9rem; line-height: 1.5; }
+  .lesson-head .pill { font-size: 0.7rem; }
+
+  /* the two Situation switches side by side */
+  .st-key-situation-toggles [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: 0.5rem; }
+  .st-key-situation-toggles [data-testid="stColumn"] { min-width: 0 !important; width: auto !important; flex: 1 1 0 !important; }
+  .st-key-situation-toggles label p { font-size: 0.85rem; }
+
+  /* phrase cards: the Korean a little smaller, so phrases wrap less */
+  .ko { font-size: 1.4rem !important; line-height: 1.4; }
+
+  /* lesson tabs: tighter, so more of them fit */
+  [data-testid="stTabs"] [role="tab"] { padding-left: 0.35rem; padding-right: 0.35rem; }
+  [data-testid="stTabs"] [role="tab"] p { font-size: 0.88rem; }
+}
+
+/* Phones, part 2: centred, app-like blocks. Short stacked items (banner, steps, cards, headers)
+   are centred; longer reading (phrase notes, the conversation) stays left-aligned. */
+@media (max-width: 640px) {
+  /* home banner */
+  .hero { text-align: center; padding: 1.5rem 1.1rem 1.8rem; }
+  .hero::before {            /* the camellia: a small accent above the title instead of a big circle */
+    content: ""; display: block; width: 0.7rem; height: 0.7rem; margin: 0 auto 0.6rem;
+    border-radius: 50%; background: #f06a84;
+  }
+  .hero { background:
+    linear-gradient(135deg, #1e2a44 0%, #23466b 55%, #2b6f96 100%); }
+  .hero h1 { font-size: 2.1rem; }
+  .hero-short { margin-left: auto; margin-right: auto; max-width: 18rem; }
+  .hero-stats { justify-content: center; }
+  /* centred text: even line lengths, no single word left on the last line */
+  .hero-short, .step small, .card-title, .card-sub, .lesson-head p, .lesson-head h1,
+  .level-lock, .prompt-en, .next-title { text-wrap: balance; }
+
+  /* section title */
+  [data-testid="stMain"] h3 { text-align: center; font-size: 1.45rem !important; }
+
+  /* how a lesson works: centred tiles */
+  .step { text-align: center; padding: 0.85rem 0.6rem 0.8rem; }
+  .step .step-icon { transform: none; margin: 0 auto 0.4rem; }
+  .step b { margin-bottom: 0.1rem; }
+
+  /* level header: centred, one item per line */
+  .level-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.3rem; margin: 1.8rem 0 0.7rem; }
+  .level-badge { font-size: 0.8rem; padding: 0.18rem 0.7rem; }
+  .level-head b { display: block; font-size: 1.3rem; margin: 0; }
+  .level-sep { display: none; }
+  .level-lock { text-align: center; font-size: 0.8rem; max-width: 19rem; margin: 0 auto 0.6rem; }
+  .level-ko { display: block; font-size: 0.95rem; opacity: 0.8; }
+  .level-head .pill { display: inline-block; margin: 0.35rem 0 0; }
+  .level-sub { font-size: 0.82rem; }
+
+  /* lesson cards: centred, compact */
+  [data-testid="stMain"] [class*="st-key-card-"] > div { padding: 0.2rem 0.1rem; text-align: center; }
+  .card-icon { font-size: 1.9rem; margin: 0 0 0.25rem; }
+  .card-title { font-size: 1.25rem !important; line-height: 1.35; }
+  .card-sub { margin: 0.05rem 0 0.45rem; font-size: 0.88rem; }
+  [class*="st-key-card-"] .pill { font-size: 0.72rem; margin: 0 0.15rem 0.3rem; }
+  [class*="st-key-card-"]:hover { transform: none; }
+
+  /* lesson header: icon on top, everything centred */
+  .lesson-head { flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
+  .lesson-head .pill { margin: 0 0.15rem 0.3rem; }
+  .course-where { text-align: center; }
+}
+
+/* Phones, part 3: instructions and practice prompts */
+@media (max-width: 640px) {
+  /* icon steps: small centred chips, no arrows (the order reads left to right anyway) */
+  .icon-steps { justify-content: center; gap: 0.35rem; margin-bottom: 0.7rem; }
+  .icon-arrow { display: none; }
+  .icon-step { padding: 0.28rem 0.65rem 0.28rem 0.45rem; gap: 0.3rem; font-size: 0.8rem; }
+  .icon-step svg { width: 16px; height: 16px; }
+  details.more[open] > div { text-align: left; }
+
+  /* the question to answer: centred, like a flashcard */
+  .prompt-pills, .prompt-label, .prompt-en { text-align: center; }
+
+  /* "Next lesson" card at the end of a lesson: centred, with the button in the middle */
+  [class*="st-key-next-up"] { text-align: center; }
+  [class*="st-key-next-up"] .next-title { text-align: center; }
+  [class*="st-key-next-up"] [data-testid="stElementContainer"]:has(button) { align-self: center; }
+}

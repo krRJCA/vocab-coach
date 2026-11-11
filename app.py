@@ -544,8 +544,8 @@ def recall_card(chunk, scenario, key):
     used_hint = st.session_state.get(hint_key, False)
 
     html(
-        f'<span class="pill">{scenario["icon"]} {escape(L(scenario, "title_en"))}</span>'
-        f'<span class="pill accent">{escape(L(chunk, "register"))}</span>'
+        f'<div class="prompt-pills"><span class="pill">{scenario["icon"]} {escape(L(scenario, "title_en"))}</span>'
+        f'<span class="pill accent">{escape(L(chunk, "register"))}</span></div>'
         f'<div class="prompt-label">{T("How do you say it in Korean?")}</div>'
         f'<div class="prompt-en">{escape(L(chunk, "en"))}</div>'
     )
@@ -677,14 +677,15 @@ def level_section(number, level):
     total = len(level["scenarios"]) + len(level.get("planned", []))
     html(
         f'<div class="level-head"><span class="level-badge">{T("Level {n}", n=number)}</span>'
-        f'<div><b>{escape(L(level, "title_en"))}</b> · {escape(level["title_ko"])}'
+        f'<div><b>{escape(L(level, "title_en"))}</b><span class="level-sep"> · </span>'
+        f'<span class="level-ko">{escape(level["title_ko"])}</span>'
         f'<span class="pill">{escape(T("{level} · TOPIK {topik} level", level=L(level, "level"), topik=level["topik"]))}</span>'
         + (f'<span class="pill accent">{T("✅ complete")}</span>' if passed else "")
-        + f'<div class="level-sub">{escape(L(level, "description"))} '
+        + f'<div class="level-sub"><span class="level-desc">{escape(L(level, "description"))} </span>'
         f'{T("{done} / {total} lessons finished (post-test taken).", done=done, total=total)}</div></div></div>'
     )
     if not unlocked:
-        st.caption(T("🔒 Recommended after Checkpoint {n}. You can still open any lesson.", n=number - 1))
+        html(f'<p class="level-lock">{T("🔒 Recommended after Checkpoint {n}. You can still open any lesson.", n=number - 1)}</p>')
     cards = [("scenario", SCENARIO_BY_ID[sid]) for sid in level["scenarios"]]
     cards += [("planned", item) for item in level.get("planned", [])]
     if level.get("checkpoint"):
@@ -700,13 +701,125 @@ def level_section(number, level):
                     checkpoint_card(number, item)
 
 
+THEME_SWITCH = st.components.v2.component(
+    "theme_switch", js=(ASSETS_DIR / "theme_switch.js").read_text(encoding="utf-8")
+)
+TOUR_COMPONENT = st.components.v2.component("tour", js=(ASSETS_DIR / "tour.js").read_text(encoding="utf-8"))
+
+
+def home_tour_steps():
+    """The home tour, in order. target: CSS selectors (| = fallbacks); none = a centred card."""
+    first = SCENARIO_BY_ID[COURSE[0][1]]
+    return [
+        (None, T("👋 Welcome to Vocab Coach"),
+         T("Learn the Korean you need in Busan, one real situation at a time. Here's a 1-minute tour of how it works.")),
+        (".hero", T("Real situations, not word lists"),
+         T("Each lesson is a place you'll really go: a café, the metro, a pharmacy. You learn the <b>whole phrases</b> people use there.")),
+        (".steps", T("Every lesson, step by step"),
+         T("<b>1 Situation:</b> listen to a real conversation. <b>2 Notice:</b> study the phrases. "
+           "<b>3 Recall:</b> say them from memory. <b>4 Role-play:</b> use them in a new conversation. "
+           "A short 📝 test before and after shows what you learned.")),
+        (f".st-key-card-{first['id']}", T("Start here"),
+         T("Lessons go from easy to harder. Begin with {lesson}, then work along Level 1.",
+           lesson=f"{first['icon']} <b>{escape(L(first, 'title_en'))}</b>")),
+        (".st-key-card-checkpoint-1", T("🏁 The checkpoint"),
+         T("After Level 1, a mixed test checks you're ready for Level 2. Already know some Korean? Try it first: it works as a placement test.")),
+        ("[data-testid=stTopNavLinkContainer]|[data-testid=stTopNav]|[data-testid=stSidebarNav]"
+         "|[data-testid=stHeader]", T("Come back every day"),
+         T("<b>🔁 Review</b> brings phrases back just before you'd forget them. <b>📈 Progress</b> shows how far you've come.")),
+        (".side-stats", T("Your phrases at a glance"),
+         T("How many phrases are due for review today, how many you've learned, and how many you've mastered.")),
+        (".st-key-side-settings", T("Speak or type"),
+         T("Answer with your <b>🎙️ voice</b> (allow the microphone) or <b>⌨️ type</b>. Speaking works best somewhere quiet.")),
+        (".st-key-lang", T("English or 日本語"),
+         T("Switch the app's language here anytime. The Korean stays the same.")),
+        (None, T("You're ready! 🎉"),
+         T("Your progress is saved in this browser. You can replay this tour anytime from the sidebar.")),
+    ]
+
+
+def lesson_tour_steps():
+    """The lesson tour: the lesson's parts, opening each tab in turn (tab = which one)."""
+    return [
+        (None, T("📖 Inside a lesson"),
+         T("Every lesson has the same five parts. Let's look at each one."), None),
+        (".lesson-head", T("The situation"),
+         T("Where you are and what happens. Everything in this lesson is for this one real situation."), None),
+        ("tab:0", T("1 · Situation"),
+         T("Listen to the whole conversation. Tap any line to hear it again, slow it down, "
+           "or hide the romanization and English when you're ready."), 0),
+        ("tab:1", T("2 · Notice"),
+         T("The key phrases, one card each: the sound, the meaning, how polite it is, and a common mistake to avoid."), 1),
+        ("tab:2", T("3 · Recall"),
+         T("See the meaning, then <b>say or type the Korean</b> from memory. Getting it right moves it into your review schedule."), 2),
+        ("tab:3", T("4 · Role-play"),
+         T("A new conversation in the same place. <b>🗣️ Practice</b> at your own pace, or try <b>⏱️ Time attack</b>: "
+           "answer in a few seconds, like a real chat."), 3),
+        ("tab:4", T("📝 Test"),
+         T("Take it before you study and again after. The 📈 Progress page shows how much you learned."), 4),
+        (".st-key-course-nav-lesson-top", T("Moving on"),
+         T("Go to the previous or next lesson here, or back to all lessons."), None),
+        (None, T("Your turn! 🎧"),
+         T("Start with <b>1 · Situation</b> and listen to the conversation."), None),
+    ]
+
+
+def onboarding(tour_id, steps, page, start_label, finish=None):
+    """A tour layer: starts by itself only for first-time learners (no saved progress)."""
+    result = TOUR_COMPONENT(
+        key=f"tour-{tour_id}-{lang()}",
+        data={
+            "id": tour_id,
+            "steps": [{"target": step[0], "title": step[1], "body": step[2], "page": page,
+                       "tab": step[3] if len(step) > 3 else None} for step in steps],
+            "auto": not progress() and not load_tests(),
+            "force": st.session_state.get("tour_force", False),
+            "replay": st.session_state.get("tour_replay", 0),
+            "reset": st.session_state.get("tour_reset", 0),
+            "finish": finish,
+            "labels": {
+                "next": T("Next →"), "back": T("← Back"), "skip": T("Skip tour"), "done": T("Close"),
+                "start": start_label, "of": T("Step {n} of {total}"),
+            },
+        },
+        on_start_lesson_change=lambda: None,
+    )
+    return getattr(result, "start_lesson", None) if finish else None
+
+
+def home_tour():
+    first = SCENARIO_BY_ID[COURSE[0][1]]
+    started = onboarding("home", home_tour_steps(), ".hero",
+                         T("Start {lesson} →", lesson=f"{first['icon']} {L(first, 'title_en')}"),
+                         finish="start_lesson")
+    if started and started != st.session_state.get("_tour_started"):
+        st.session_state["_tour_started"] = started
+        go("Lesson", first["id"])
+
+
+def lesson_tour():
+    onboarding("lesson", lesson_tour_steps(), ".lesson-head", T("Let's go →"))
+
+
+def replay_tour():
+    st.session_state["tour_replay"] = st.session_state.get("tour_replay", 0) + 1
+
+
+def reset_tours():
+    """Dev: forget the tours were seen and start them again, even with saved progress."""
+    st.session_state["tour_reset"] = st.session_state.get("tour_reset", 0) + 1
+    st.session_state["tour_force"] = True
+
+
 def home_page():
+    home_tour()
     phrase_count = sum(len(scenario["chunks"]) for scenario in SCENARIOS)
     html(
         '<div class="hero">'
-        f'<div class="hero-kicker">부산에서 바로 쓰는 한국어 · {T("REAL KOREAN FOR BUSAN")}</div>'
+        f'<div class="hero-kicker">부산에서 바로 쓰는 한국어<span class="kicker-en"> · {T("REAL KOREAN FOR BUSAN")}</span></div>'
         "<h1>Scenario Vocab <span class=\"accent-word\">Coach</span></h1>"
-        f"<p>{T('Learn the Korean you actually need in Busan: whole phrases inside real situations, practiced until you can say them without help.')}</p>"
+        f"<p class=\"hero-long\">{T('Learn the Korean you actually need in Busan: whole phrases inside real situations, practiced until you can say them without help.')}</p>"
+        f"<p class=\"hero-short\">{T('Real Korean for real situations in Busan.')}</p>"
         '<div class="hero-stats">'
         f"<span>{T('🎬 {n} scenarios in {levels} levels', n=len(SCENARIOS), levels=len(LEVELS))}</span>"
         f"<span>{T('💬 {n} phrases', n=phrase_count)}</span>"
@@ -933,9 +1046,10 @@ def lesson_page():
     situation_tab, notice_tab, recall_tab, roleplay_tab, test_tab = remembered_tabs(
         scenario_id, ["1 · Situation", "2 · Notice", "3 · Recall", "4 · Role-play", "📝 Test"]
     )
+    lesson_tour()
 
     with situation_tab:
-        toggles = st.columns(2)
+        toggles = st.container(key="situation-toggles").columns(2)
         show_romanization = toggles[0].toggle(T("Show romanization"), value=True)
         show_english = toggles[1].toggle(T("Show English"), value=True)
         if not conversation_player(scenario, show_romanization, show_english):
@@ -1761,9 +1875,13 @@ def em_decode(path):
 # ---------- Layout ----------
 
 st.set_page_config(page_title="Scenario Vocab Coach", page_icon="🇰🇷", layout="wide")
-html(f"<style>{STYLE_PATH.read_text(encoding='utf-8')}</style>")
-if st.context.theme.type == "light":
-    html(f"<style>{LIGHT_STYLE_PATH.read_text(encoding='utf-8')}</style>")
+_styles = st.container(key="app-styles")  # style sheets only: the box itself takes no space (style.css)
+with _styles:
+    html(f"<style>{STYLE_PATH.read_text(encoding='utf-8')}</style>")
+# light-mode extras, switched on in the browser by assets/theme_switch.js (html[data-vc-theme=light]),
+# so they follow a theme change at once: changing the theme doesn't rerun the app
+with _styles:
+    html(f"<style>html[data-vc-theme=\"light\"] {{\n{LIGHT_STYLE_PATH.read_text(encoding='utf-8')}\n}}</style>")
 
 STORAGE_NOTES = {  # (text, tooltip)
     "browser": ("💾 Your progress is saved only in this browser, on this device",
@@ -1871,6 +1989,12 @@ with st.sidebar:
             help=T("Accept answers with different words but the same meaning (Hugging Face model {model}).",
                    model=semantic.MODEL_NAME),
         )
+    if st.button(T("🧭 Take the tour"), key="tour-replay", width="stretch", on_click=replay_tour):
+        if navigation.title not in (PAGES["Home"].title, PAGES["Lesson"].title):
+            st.switch_page(PAGES["Home"])  # the lesson has its own tour; other pages use the home one
+    if dev_mode():
+        st.button(T("🔄 Reset tours") + DEV_MARK, key="tour-reset", width="stretch", on_click=reset_tours,
+                  help="Dev only: forget that the tours were seen, then start them again (even with saved progress).")
     if login_enabled():
         st.caption(T("Signed in as **{name}**", name=st.user.get('name') or user_email()))
         if st.button(T("Sign out"), icon=":material/logout:", key="sign-out"):
@@ -1880,13 +2004,25 @@ with st.sidebar:
         f'{T("AI project prototype · v0.1")}</div>'
     )
 
+SHORT_STORAGE_NOTES = {"browser": "💾 Saved in this browser", "server": "💾 Resets on restart",
+                       "local": "💾 Saved on this computer"}
 html(
-    f'<div class="wip-banner"><span title="{escape(T("The Korean content and voices are still being checked, so expect rough edges."))}">'
+    f'<div class="wip-banner"><span class="wip-long">'
+    f'<span title="{escape(T("The Korean content and voices are still being checked, so expect rough edges."))}">'
     f'{T("🚧 Class prototype, still being checked")}</span>'
     + (f'<span class="wip-sep">·</span><span>{T("🇯🇵 Japanese is AI-translated, still being checked")}</span>'
        if lang() == "ja" else "")
-    + f'<span class="wip-sep">·</span>{RESET_NOTE}</div>'
+    + f'<span class="wip-sep">·</span>{RESET_NOTE}</span>'
+    # phones: the same notes, short enough for one line
+    f'<span class="wip-short">{T("🚧 Prototype")}'
+    + (f'<span class="wip-sep">·</span>{T("🇯🇵 AI-translated")}' if lang() == "ja" else "")
+    + f'<span class="wip-sep">·</span>{T(SHORT_STORAGE_NOTES[storage_mode()])}</span></div>'
 )
+
+# light / dark switch in the top-right bar (the component only places the button there)
+with st.container(key="theme-switch-slot"):
+    THEME_SWITCH(key="theme-switch", data={"labels": {
+        "light": T("Switch to light mode"), "dark": T("Switch to dark mode")}})
 
 noise_banner()
 navigation.run()

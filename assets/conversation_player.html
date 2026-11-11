@@ -36,6 +36,14 @@
           transition: background .2s, border-color .2s, transform .2s; }
   .line.me { background: var(--me); margin-left: 36px; }
   .line:not(.me) { margin-right: 36px; }
+  .ko { word-break: keep-all; overflow-wrap: anywhere; }  /* wrap Korean at spaces, not mid-word */
+  @media (max-width: 480px) {  /* phones: wider bubbles, so lines wrap less */
+    .line { gap: 8px; padding: 10px 11px; }
+    .line.me { margin-left: 18px; }
+    .line:not(.me) { margin-right: 18px; }
+    .avatar { font-size: 19px; }
+    .ko { font-size: 17px; }
+  }
   .line.active { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.01); }
   .line.silent { cursor: default; opacity: .7; }
   .avatar { font-size: 22px; line-height: 1; padding-top: 2px; }

@@ -1,4 +1,5 @@
-/* Light theme only (app.py loads this when the light theme is active).
+/* Light theme only: app.py nests these rules under html[data-vc-theme="light"], which
+   assets/theme_switch.js sets from the page's real colours (so a theme change applies at once).
    The navy banners suit dark mode; on warm paper they look heavy, so in light
    mode they become a soft camellia-to-sea wash with navy text. */
 
@@ -31,4 +32,17 @@
   background: rgba(255, 255, 255, 0.75);
   border-color: rgba(30, 42, 68, 0.12);
   color: var(--harbor);
+}
+
+/* Onboarding tour card on warm paper */
+.vc-tour-card { background: #fffaf4; color: var(--harbor); border-color: #eadbd0; box-shadow: 0 18px 50px rgba(30, 42, 68, 0.22); }
+.vc-tour-count { color: var(--camellia); }
+.vc-tour-dots span { background: rgba(30, 42, 68, .18); }
+.vc-tour-dots span.on { background: var(--camellia); }
+.vc-tour button { border-color: rgba(30, 42, 68, .25); }
+.vc-tour button:focus-visible { outline-color: var(--camellia); }
+
+/* phones: the same wash without the big circle (style.css adds a small camellia dot instead) */
+@media (max-width: 640px) {
+  .hero { background: linear-gradient(135deg, #fff0f2 0%, #fbf3ea 48%, #e5f0f6 100%); }
 }
